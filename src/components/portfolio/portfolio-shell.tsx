@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Lenis from "lenis";
+import gsap from "gsap";
 import {
   AnimatePresence,
   motion,
@@ -10,6 +11,7 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   capabilities,
   expertiseModules,
@@ -30,16 +32,33 @@ const fadeInUp = {
   transition: { duration: 0.75, ease: [0.22, 1, 0.36, 1] },
 } as const;
 
+const workItemMotion = {
+  initial: { opacity: 0, y: 40 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, amount: 0.2 },
+} as const;
+
 export function PortfolioShell() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeIdentity, setActiveIdentity] = useState<string>(identityTabs[0].id);
   const [openModule, setOpenModule] = useState<string>(expertiseModules[0].id);
   const [activeProtocol, setActiveProtocol] = useState<string>(protocols[0].id);
   const [typedText, setTypedText] = useState("");
+  const [profilePhotoMissing, setProfilePhotoMissing] = useState(false);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  const [projectsRailProgress, setProjectsRailProgress] = useState(0);
   const cursorDotRef = useRef<HTMLDivElement | null>(null);
   const cursorOutlineRef = useRef<HTMLDivElement | null>(null);
+  const projectsSectionRef = useRef<HTMLElement | null>(null);
+  const projectsRailViewportRef = useRef<HTMLDivElement | null>(null);
+  const projectsRailTrackRef = useRef<HTMLDivElement | null>(null);
+  const workSectionRef = useRef<HTMLElement | null>(null);
   const shouldReduceMotion = useReducedMotion();
   const { scrollY, scrollYProgress } = useScroll();
+  const { scrollYProgress: workScrollProgress } = useScroll({
+    target: workSectionRef,
+    offset: ["start 70%", "end 35%"],
+  });
   const smoothProgress = useSpring(scrollYProgress, {
     stiffness: 120,
     damping: 24,
@@ -50,6 +69,61 @@ export function PortfolioShell() {
   const heroOrbOneY = useTransform(scrollY, [0, 1200], [0, shouldReduceMotion ? 0 : 180]);
   const heroOrbTwoY = useTransform(scrollY, [0, 1200], [0, shouldReduceMotion ? 0 : 110]);
   const heroCardY = useTransform(scrollY, [0, 900], [0, shouldReduceMotion ? 0 : -70]);
+  const projectsBarScale = useSpring(projectsRailProgress, {
+    stiffness: 140,
+    damping: 26,
+    mass: 0.22,
+  });
+  const workLineProgress = useSpring(workScrollProgress, {
+    stiffness: 110,
+    damping: 24,
+    mass: 0.24,
+  });
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const section = projectsSectionRef.current;
+    const viewport = projectsRailViewportRef.current;
+    const track = projectsRailTrackRef.current;
+    if (!section || !viewport || !track || window.innerWidth < 768 || shouldReduceMotion) {
+      return;
+    }
+
+    const context = gsap.context(() => {
+      const maxTravel = Math.max(0, track.scrollWidth - viewport.clientWidth);
+      gsap.set(track, { x: 0 });
+
+      if (maxTravel <= 0) {
+        setProjectsRailProgress(0);
+        return;
+      }
+
+      gsap.to(track, {
+        x: -maxTravel,
+        ease: "none",
+        scrollTrigger: {
+          trigger: section,
+          start: "top top",
+          end: `+=${maxTravel}`,
+          pin: true,
+          scrub: 1,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+          onUpdate: (self) => setProjectsRailProgress(self.progress),
+        },
+      });
+    }, section);
+
+    const handleRefresh = () => ScrollTrigger.refresh();
+    window.addEventListener("resize", handleRefresh);
+
+    return () => {
+      window.removeEventListener("resize", handleRefresh);
+      context.revert();
+      setProjectsRailProgress(0);
+    };
+  }, [shouldReduceMotion]);
 
   useEffect(() => {
     let index = 0;
@@ -170,6 +244,7 @@ export function PortfolioShell() {
   useEffect(() => {
     const updateScrollPosition = () => {
       document.documentElement.style.setProperty("--scroll-y", `${window.scrollY}px`);
+      setShowBackToTop(window.scrollY > 560);
     };
 
     updateScrollPosition();
@@ -305,7 +380,8 @@ export function PortfolioShell() {
               href="#projects"
               whileHover={{ y: -4, scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
-              className="rounded-sm bg-[var(--color-ink)] px-8 py-4 font-mono text-xs font-bold uppercase tracking-[0.18em] text-black transition hover:-translate-y-0.5 hover:bg-white"
+              style={{ backgroundColor: "#3ddc97", color: "#050505" }}
+              className="inline-flex items-center justify-center rounded-sm px-8 py-4 font-mono text-sm font-bold uppercase tracking-[0.16em] shadow-[0_18px_40px_rgba(61,220,151,0.2)] transition hover:-translate-y-0.5"
             >
               View Projects
             </motion.a>
@@ -346,47 +422,36 @@ export function PortfolioShell() {
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.9, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="glass-panel hidden rounded-[2rem] p-6 lg:block"
+            className="hidden lg:block"
           >
-            <div className="mb-6 flex items-center justify-between">
-              <div>
-                <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/45">
-                  Active Build Mode
-                </p>
-                <h2 className="mt-2 text-2xl font-bold tracking-[-0.05em]">
-                  Product systems with high visual intent.
-                </h2>
-              </div>
-              <div className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.18em] text-emerald-300">
-                Live
-              </div>
-            </div>
-
-            <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
-              <div className="mb-4 flex items-center gap-3">
-                <div className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
-                <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/50">
-                  Current Focus
-                </p>
-              </div>
-              <div className="space-y-4">
-                {[
-                  "Motion-led frontend systems",
-                  "Scalable API and dashboard architecture",
-                  "Performance tuning for production release",
-                ].map((item, index) => (
-                  <motion.div
-                    key={item}
-                    initial={{ opacity: 0, x: 16 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.45 + index * 0.1 }}
-                    className="flex items-start gap-3 rounded-2xl border border-white/8 bg-white/[0.03] p-4"
-                  >
-                    <span className="mt-1 h-2 w-2 rounded-full bg-[var(--color-accent)]" />
-                    <span className="text-sm leading-7 text-[var(--color-muted)]">{item}</span>
-                  </motion.div>
-                ))}
-              </div>
+            <div className="glass-panel overflow-hidden rounded-[2rem]">
+              {!profilePhotoMissing ? (
+                <div className="relative">
+                  <img
+                    src="/profile-photo.jpg"
+                    alt="Professional portrait"
+                    className="h-[34rem] w-full object-cover"
+                    onError={() => setProfilePhotoMissing(true)}
+                  />
+                  <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.02),rgba(0,0,0,0.18)_72%,rgba(0,0,0,0.38))]" />
+                </div>
+              ) : (
+                <div className="relative flex h-[34rem] items-end overflow-hidden bg-[radial-gradient(circle_at_top,rgba(61,220,151,0.12),transparent_42%),linear-gradient(180deg,#111111_0%,#090909_100%)] p-8">
+                  <div className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(61,220,151,0.55),transparent)]" />
+                  <div className="absolute right-[-3rem] top-[-2rem] h-40 w-40 rounded-full bg-emerald-400/10 blur-3xl" />
+                  <div className="relative flex items-center gap-4">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-full border border-emerald-400/20 bg-white/4 text-[var(--color-accent)]">
+                      <Icon name="fingerprint" className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--color-accent)]">
+                        Portrait Placeholder
+                      </p>
+                      <p className="mt-2 text-sm text-white/55">Use `public/profile-photo.jpg`</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </motion.aside>
         </motion.div>
@@ -644,136 +709,304 @@ export function PortfolioShell() {
         </div>
       </section>
 
-      <section id="projects" className="overflow-hidden bg-black/40 py-24">
-        <div className="mx-auto max-w-7xl px-6 lg:px-12">
-          <motion.div {...fadeInUp} className="mb-12 grid gap-12 lg:grid-cols-12">
-            <div className="lg:col-span-4">
+      <section id="projects" ref={projectsSectionRef} className="overflow-hidden bg-black/40 py-24 md:py-0">
+        <div className="mx-auto max-w-7xl px-6 lg:px-12 md:flex md:h-screen md:flex-col md:justify-center">
+          <motion.div {...fadeInUp} className="mb-12 grid gap-12 lg:grid-cols-12 lg:items-end">
+            <div className="lg:col-span-5">
               <h2 className="text-4xl font-bold tracking-[-0.05em] md:text-6xl">
                 Selected Works<span className="text-[var(--color-accent)]">.</span>
               </h2>
-              <p className="mt-4 text-sm leading-7 text-[var(--color-soft)]">
-                A cross-section of web products and platform work spanning
-                healthcare, commerce, operations, and travel.
+              <p className="mt-4 max-w-xl text-sm leading-7 text-[var(--color-soft)]">
+                A curated horizontal showcase of product work across healthcare,
+                commerce, travel, and operations systems.
               </p>
-              <p className="mt-6 flex items-center gap-2 font-mono text-xs uppercase tracking-[0.18em] text-white/35">
-                Scroll to explore <Icon name="arrowRight" className="h-4 w-4" />
-              </p>
+            </div>
+            <div className="hidden lg:col-span-7 md:flex md:items-end md:justify-end">
+              <div className="w-full max-w-sm">
+                <div className="mb-3 flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.18em] text-white/35">
+                  <span>Horizontal Scroll</span>
+                  <span>{projects.length} projects</span>
+                </div>
+                <div className="h-px overflow-hidden bg-white/10">
+                  <motion.div
+                    style={{ scaleX: projectsBarScale }}
+                    className="h-full origin-left bg-[var(--color-accent)]"
+                  />
+                </div>
+              </div>
             </div>
           </motion.div>
 
-          <motion.div {...fadeInUp} className="hide-scrollbar flex gap-6 overflow-x-auto pb-4">
-            {projects.map((project, index) => (
-              <motion.article
-                key={project.name}
-                data-cursor="interactive"
-                initial={{ opacity: 0, x: 40 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, amount: 0.15 }}
-                transition={{ delay: index * 0.08, duration: 0.65 }}
-                whileHover={{ y: -10 }}
-                className="glass-panel group min-w-[340px] max-w-[430px] flex-1 overflow-hidden rounded-[1.75rem]"
-              >
-                <div className={`relative flex h-60 items-end justify-start overflow-hidden bg-gradient-to-br ${project.gradient} p-6`}>
-                  <motion.div
-                    whileHover={{ scale: 1.08 }}
-                    className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_35%)]"
-                  />
-                  <div className="relative z-10">
-                    <div className="mb-3 flex flex-wrap gap-2">
-                      <span className="rounded-full bg-black/25 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.16em] text-white/75">
-                        {project.category}
-                      </span>
-                      <span className="rounded-full bg-black/25 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.16em] text-white/75">
-                        {project.stack}
-                      </span>
+          <div ref={projectsRailViewportRef} className="relative hidden overflow-hidden md:block">
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-[linear-gradient(90deg,rgba(5,5,5,0.96),rgba(5,5,5,0))]" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-[linear-gradient(270deg,rgba(5,5,5,0.96),rgba(5,5,5,0))]" />
+
+            <div className="pb-6">
+              <div ref={projectsRailTrackRef} className="flex w-max gap-6 pl-2 pr-2 will-change-transform">
+              {projects.map((project, index) => (
+                <motion.article
+                  key={project.name}
+                  data-cursor="interactive"
+                  initial={{ opacity: 0, y: 32 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ delay: index * 0.05, duration: 0.65 }}
+                  whileHover={{ y: -8 }}
+                  className="glass-panel group flex min-h-[31rem] w-[29rem] flex-col overflow-hidden rounded-[1.75rem]"
+                >
+                  <div
+                    className={`relative flex h-64 items-end overflow-hidden bg-gradient-to-br ${project.gradient} p-6`}
+                  >
+                    <motion.div
+                      whileHover={{ scale: 1.04 }}
+                      className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_35%)]"
+                    />
+                    <div className="relative z-10">
+                      <div className="mb-3 flex flex-wrap gap-2">
+                        <span className="rounded-full bg-black/25 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.16em] text-white/75">
+                          {project.category}
+                        </span>
+                        <span className="rounded-full bg-black/25 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.16em] text-white/75">
+                          {project.stack}
+                        </span>
+                      </div>
+                      <h3 className="text-3xl font-black tracking-[-0.06em]">{project.name}</h3>
                     </div>
-                    <h3 className="text-3xl font-black tracking-[-0.06em]">{project.name}</h3>
                   </div>
-                </div>
-                <div className="p-6">
-                  <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                    {project.summary}
-                  </p>
-                  <div className="mt-5 flex flex-wrap gap-3">
-                    <motion.a
-                      href="#"
-                      whileHover={{ y: -3 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="inline-flex items-center gap-2 rounded-full bg-[var(--color-ink)] px-4 py-2 text-xs font-bold text-black transition hover:bg-white"
-                    >
-                      View Project <Icon name="externalLink" className="h-3.5 w-3.5" />
-                    </motion.a>
-                    <motion.a
-                      href="#"
-                      whileHover={{ y: -3 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-xs font-bold transition hover:border-emerald-400/45 hover:text-[var(--color-accent)]"
-                    >
-                      <Icon name="github" className="h-3.5 w-3.5" />
-                      Source
-                    </motion.a>
+
+                  <div className="flex flex-1 flex-col border-t border-white/8 bg-black/30 p-6">
+                    <p className="text-sm leading-7 text-[var(--color-muted)]">
+                      {project.summary}
+                    </p>
+
+                    <div className="mt-auto pt-6">
+                      <div className="flex flex-wrap gap-3">
+                        <motion.a
+                          href="#"
+                          whileHover={{ y: -3 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/14 px-4 py-2 text-xs font-bold text-white shadow-[0_10px_24px_rgba(0,0,0,0.18)] transition hover:border-white/32 hover:bg-white/20"
+                        >
+                          View Project <Icon name="externalLink" className="h-3.5 w-3.5" />
+                        </motion.a>
+                        <motion.a
+                          href="#"
+                          whileHover={{ y: -3 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="inline-flex items-center gap-2 rounded-full border border-white/16 bg-black/20 px-4 py-2 text-xs font-bold text-white/88 transition hover:border-emerald-400/45 hover:bg-emerald-400/8 hover:text-[var(--color-accent)]"
+                        >
+                          <Icon name="github" className="h-3.5 w-3.5" />
+                          Source
+                        </motion.a>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </motion.article>
-            ))}
-          </motion.div>
+                </motion.article>
+              ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="relative md:hidden">
+            <div className="hide-scrollbar flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4">
+              {projects.map((project, index) => (
+                <motion.article
+                  key={project.name}
+                  data-cursor="interactive"
+                  initial={{ opacity: 0, y: 32 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ delay: index * 0.06, duration: 0.65 }}
+                  whileHover={{ y: -8 }}
+                  className="glass-panel group flex min-h-[31rem] min-w-[86%] snap-start flex-col overflow-hidden rounded-[1.75rem]"
+                >
+                  <div
+                    className={`relative flex h-64 items-end overflow-hidden bg-gradient-to-br ${project.gradient} p-6`}
+                  >
+                    <motion.div
+                      whileHover={{ scale: 1.04 }}
+                      className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_35%)]"
+                    />
+                    <div className="relative z-10">
+                      <div className="mb-3 flex flex-wrap gap-2">
+                        <span className="rounded-full bg-black/25 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.16em] text-white/75">
+                          {project.category}
+                        </span>
+                        <span className="rounded-full bg-black/25 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.16em] text-white/75">
+                          {project.stack}
+                        </span>
+                      </div>
+                      <h3 className="text-3xl font-black tracking-[-0.06em]">{project.name}</h3>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-1 flex-col border-t border-white/8 bg-black/30 p-6">
+                    <p className="text-sm leading-7 text-[var(--color-muted)]">
+                      {project.summary}
+                    </p>
+
+                    <div className="mt-auto pt-6">
+                      <div className="flex flex-wrap gap-3">
+                        <motion.a
+                          href="#"
+                          whileHover={{ y: -3 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/14 px-4 py-2 text-xs font-bold text-white shadow-[0_10px_24px_rgba(0,0,0,0.18)] transition hover:border-white/32 hover:bg-white/20"
+                        >
+                          View Project <Icon name="externalLink" className="h-3.5 w-3.5" />
+                        </motion.a>
+                        <motion.a
+                          href="#"
+                          whileHover={{ y: -3 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="inline-flex items-center gap-2 rounded-full border border-white/16 bg-black/20 px-4 py-2 text-xs font-bold text-white/88 transition hover:border-emerald-400/45 hover:bg-emerald-400/8 hover:text-[var(--color-accent)]"
+                        >
+                          <Icon name="github" className="h-3.5 w-3.5" />
+                          Source
+                        </motion.a>
+                      </div>
+                    </div>
+                  </div>
+                </motion.article>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
-      <section id="work" className="mx-auto max-w-5xl px-6 py-24 lg:px-12">
+      <section
+        id="work"
+        ref={workSectionRef}
+        className="mx-auto max-w-6xl px-6 py-24 lg:px-12"
+      >
         <motion.div {...fadeInUp} className="mb-16 text-center">
           <h2 className="text-4xl font-bold tracking-[-0.05em] md:text-5xl">
             Work History<span className="text-[var(--color-accent)]">.</span>
           </h2>
+          <p className="mt-4 text-[var(--color-soft)]">
+            Roles shaped across product engineering, platform delivery, and team execution.
+          </p>
         </motion.div>
 
-        <div className="relative space-y-12">
-          <div className="absolute left-1/2 top-0 hidden h-full w-px -translate-x-1/2 bg-emerald-400/20 md:block" />
+        <div className="relative mx-auto max-w-5xl space-y-10">
+          <div className="absolute bottom-0 left-[1.2rem] top-0 w-px bg-white/10 md:left-1/2 md:-translate-x-1/2" />
+          <motion.div
+            style={{ scaleY: workLineProgress }}
+            className="absolute bottom-0 left-[1.2rem] top-0 w-px origin-top bg-[linear-gradient(180deg,rgba(61,220,151,0.18),rgba(61,220,151,0.92),rgba(61,220,151,0.2))] md:left-1/2 md:-translate-x-1/2"
+          />
           {workHistory.map((item, index) => {
             const leftCard = item.side === "left";
-            const card = (
-              <motion.article
-                whileHover={{ y: -6 }}
-                className="glass-panel rounded-[1.5rem] p-6"
-              >
-                <h3 className="text-xl font-bold">{item.role}</h3>
-                <p className="mt-1 text-sm text-[var(--color-accent)]">
-                  {item.company} · {item.model}
-                </p>
-                <ul className="mt-4 space-y-3 text-sm leading-7 text-[var(--color-muted)]">
-                  {item.bullets.map((bullet) => (
-                    <li key={bullet} className="flex items-start gap-3">
-                      <span className="mt-2 h-2 w-2 rounded-full bg-[var(--color-accent)]" />
-                      <span>{bullet}</span>
-                    </li>
-                  ))}
-                </ul>
-              </motion.article>
-            );
-
-            const date = (
-              <div className="inline-flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-accent)]">
-                <Icon name="calendar" className="h-3.5 w-3.5" />
-                {item.period}
-              </div>
-            );
 
             return (
               <motion.div
                 key={`${item.company}-${item.period}`}
-                initial={{ opacity: 0, y: 32 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.15 }}
-                transition={{ delay: index * 0.08 }}
-                className="relative"
+                {...workItemMotion}
+                transition={{ duration: 0.7, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                className="relative grid grid-cols-[auto_1fr] gap-5 md:grid-cols-[1fr_auto_1fr] md:gap-8"
               >
-                <div className="absolute left-1/2 top-8 hidden h-3 w-3 -translate-x-1/2 rounded-full border-4 border-[var(--color-page)] bg-[var(--color-accent)] md:block" />
-                <div className="grid gap-8 md:grid-cols-2">
-                  <div className={leftCard ? "order-2 md:order-1 md:pr-12" : "md:pr-12 md:text-right"}>
-                    {leftCard ? card : date}
-                  </div>
-                  <div className="md:pl-12">{leftCard ? date : card}</div>
+                <div className="hidden md:block md:order-1">
+                  {leftCard ? (
+                    <motion.article
+                      whileHover={{ y: -6 }}
+                      transition={{ duration: 0.2 }}
+                      className="glass-panel relative mr-10 overflow-hidden rounded-[1.75rem] p-7"
+                    >
+                      <div className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(61,220,151,0.7),transparent)]" />
+                      <div className="flex items-start justify-between gap-5">
+                        <div>
+                          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-accent)]">
+                            {item.company}
+                          </p>
+                          <h3 className="mt-2 text-2xl font-bold tracking-[-0.04em]">{item.role}</h3>
+                          <p className="mt-2 text-sm text-white/55">{item.model}</p>
+                        </div>
+                        <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/8 px-3 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-300">
+                          <Icon name="calendar" className="h-3.5 w-3.5" />
+                          {item.period}
+                        </div>
+                      </div>
+
+                      <ul className="mt-6 space-y-3 text-sm leading-7 text-[var(--color-muted)]">
+                        {item.bullets.map((bullet, bulletIndex) => (
+                          <motion.li
+                            key={bullet}
+                            initial={{ opacity: 0, x: -12 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true, amount: 0.6 }}
+                            transition={{
+                              duration: 0.45,
+                              delay: index * 0.08 + bulletIndex * 0.06,
+                              ease: [0.22, 1, 0.36, 1],
+                            }}
+                            className="flex items-start gap-3"
+                          >
+                            <span className="mt-2 h-2 w-2 rounded-full bg-[var(--color-accent)]" />
+                            <span>{bullet}</span>
+                          </motion.li>
+                        ))}
+                      </ul>
+                    </motion.article>
+                  ) : (
+                    <div />
+                  )}
                 </div>
+
+                <div className="relative z-10 flex justify-center md:order-2">
+                  <div className="mt-8 flex h-10 w-10 items-center justify-center rounded-full border border-emerald-400/35 bg-black shadow-[0_0_0_6px_rgba(5,5,5,1)]">
+                    <motion.span
+                      whileInView={{ scale: [0.8, 1.1, 1] }}
+                      viewport={{ once: true, amount: 0.7 }}
+                      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                      className="h-2.5 w-2.5 rounded-full bg-[var(--color-accent)]"
+                    />
+                  </div>
+                </div>
+
+                <div className="md:order-3">
+                  <motion.article
+                    whileHover={{ y: -6 }}
+                    transition={{ duration: 0.2 }}
+                    className={`glass-panel relative overflow-hidden rounded-[1.75rem] p-6 md:p-7 ${
+                      leftCard ? "md:hidden" : "md:ml-10"
+                    }`}
+                  >
+                    <div className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(61,220,151,0.7),transparent)]" />
+                    <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+                      <div>
+                        <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-accent)]">
+                          {item.company}
+                        </p>
+                        <h3 className="mt-2 text-2xl font-bold tracking-[-0.04em]">{item.role}</h3>
+                        <p className="mt-2 text-sm text-white/55">{item.model}</p>
+                      </div>
+                      <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/8 px-3 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-300">
+                        <Icon name="calendar" className="h-3.5 w-3.5" />
+                        {item.period}
+                      </div>
+                    </div>
+
+                    <ul className="mt-6 space-y-3 text-sm leading-7 text-[var(--color-muted)]">
+                      {item.bullets.map((bullet, bulletIndex) => (
+                        <motion.li
+                          key={bullet}
+                          initial={{ opacity: 0, x: -12 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          viewport={{ once: true, amount: 0.6 }}
+                          transition={{
+                            duration: 0.45,
+                            delay: index * 0.08 + bulletIndex * 0.06,
+                            ease: [0.22, 1, 0.36, 1],
+                          }}
+                          className="flex items-start gap-3"
+                        >
+                          <span className="mt-2 h-2 w-2 rounded-full bg-[var(--color-accent)]" />
+                          <span>{bullet}</span>
+                        </motion.li>
+                      ))}
+                    </ul>
+                  </motion.article>
+                </div>
+
               </motion.div>
             );
           })}
@@ -781,40 +1014,97 @@ export function PortfolioShell() {
       </section>
 
       <section className="bg-black/40 py-24">
-        <div className="mx-auto grid max-w-7xl items-center gap-8 px-6 lg:grid-cols-12 lg:px-12">
-          <motion.div {...fadeInUp} className="lg:col-span-8">
-            <div className="mb-4 inline-flex items-center gap-3">
-              <span className="rounded-full bg-emerald-400/15 px-3 py-1 font-mono text-xs font-bold uppercase tracking-[0.16em] text-emerald-300">
-                Verified Degree
-              </span>
-              <span className="font-mono text-sm text-white/35">2021 - 2025</span>
-            </div>
-            <h2 className="text-4xl font-bold tracking-[-0.05em] md:text-5xl">
-              Education<span className="text-[var(--color-accent)]">.</span>
-            </h2>
-            <h3 className="mt-6 text-3xl font-bold tracking-[-0.04em]">
-              B.Sc. in Computer Science <span className="text-[var(--color-accent)]">&</span>{" "}
-              Engineering
-            </h3>
-            <p className="mt-2 text-xl text-[var(--color-muted)]">
-              American International University-Bangladesh
-            </p>
-            <p className="mt-4 max-w-2xl leading-8 text-[var(--color-soft)]">
-              Specialized in software architecture, development, advanced algorithms,
-              and distributed systems with a focus on scalable engineering
-              solutions.
-            </p>
-          </motion.div>
+        <div className="mx-auto max-w-7xl px-6 lg:px-12">
           <motion.div
             {...fadeInUp}
-            whileHover={{ rotate: 8, scale: 1.04 }}
-            className="flex justify-start lg:col-span-4 lg:justify-end"
+            className="glass-panel relative overflow-hidden rounded-[2rem] p-8 md:p-10"
           >
-            <div className="glass-panel flex h-32 w-32 items-center justify-center rounded-full">
-              <Icon
-                name="graduationCap"
-                className="h-12 w-12 text-[var(--color-accent)]"
-              />
+            <div className="absolute right-[-6rem] top-[-4rem] h-40 w-40 rounded-full bg-emerald-400/8 blur-3xl" />
+            <div className="absolute left-[-4rem] bottom-[-5rem] h-32 w-32 rounded-full bg-sky-400/8 blur-3xl" />
+
+            <div className="relative grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+              <div>
+                <div className="mb-5 flex flex-wrap items-center gap-3">
+                  <span className="rounded-full bg-emerald-400/15 px-3 py-1 font-mono text-xs font-bold uppercase tracking-[0.16em] text-emerald-300">
+                    Education
+                  </span>
+                  <span className="rounded-full border border-white/10 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.16em] text-white/40">
+                    2021 - 2025
+                  </span>
+                </div>
+
+                <h2 className="text-4xl font-bold tracking-[-0.05em] md:text-5xl">
+                  Academic Foundation<span className="text-[var(--color-accent)]">.</span>
+                </h2>
+
+                <h3 className="mt-6 max-w-3xl text-3xl font-bold tracking-[-0.04em] md:text-4xl">
+                  B.Sc. in Computer Science <span className="text-[var(--color-accent)]">&</span>{" "}
+                  Engineering
+                </h3>
+
+                <p className="mt-3 text-lg text-[var(--color-muted)]">
+                  American International University-Bangladesh
+                </p>
+
+                <p className="mt-5 max-w-2xl leading-8 text-[var(--color-soft)]">
+                  Built a strong foundation in software architecture, advanced algorithms,
+                  systems thinking, and implementation discipline with an emphasis on
+                  scalable engineering and practical problem solving.
+                </p>
+
+                <div className="mt-8 flex flex-wrap gap-3">
+                  {["Software Architecture", "Distributed Systems", "Algorithms"].map((item) => (
+                    <span
+                      key={item}
+                      className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-xs font-mono uppercase tracking-[0.16em] text-white/55"
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <motion.div
+                whileHover={{ y: -6 }}
+                className="rounded-[1.75rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))] p-6"
+              >
+                <div className="mb-6 flex items-center justify-between">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-400/10 text-[var(--color-accent)]">
+                    <Icon name="graduationCap" className="h-7 w-7" />
+                  </div>
+                  <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/35">
+                    Degree Summary
+                  </span>
+                </div>
+
+                <div className="space-y-5">
+                  <div className="border-b border-white/8 pb-4">
+                    <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/40">
+                      Qualification
+                    </p>
+                    <p className="mt-2 text-xl font-bold">Bachelor&apos;s Degree</p>
+                  </div>
+
+                  <div className="border-b border-white/8 pb-4">
+                    <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/40">
+                      Discipline
+                    </p>
+                    <p className="mt-2 text-lg font-semibold text-white/88">
+                      Computer Science & Engineering
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/40">
+                      Focus
+                    </p>
+                    <p className="mt-2 text-sm leading-7 text-[var(--color-soft)]">
+                      Engineering-first training grounded in systems design, software
+                      construction, and analytical problem solving.
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
             </div>
           </motion.div>
         </div>
@@ -963,19 +1253,62 @@ export function PortfolioShell() {
         </div>
       </section>
 
-      <footer className="border-t border-white/6 py-8">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 text-sm text-white/35 md:flex-row lg:px-12">
-          <p>© 2026 Arafin Rounok. All rights reserved.</p>
-          <motion.button
-            type="button"
-            whileHover={{ y: -2 }}
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="inline-flex items-center gap-2 transition hover:text-[var(--color-accent)]"
-          >
-            Back to Top <Icon name="arrowUp" className="h-4 w-4" />
-          </motion.button>
+      <footer className="border-t border-white/8 bg-black/55">
+        <div className="mx-auto flex max-w-7xl flex-col gap-10 px-6 py-12 lg:px-12">
+          <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
+            <div className="max-w-lg">
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
+                Nasimul Arafin Rounok
+              </p>
+              <h2 className="mt-3 text-2xl font-bold tracking-[-0.05em] text-white">
+                Full Stack Engineer building clean, scalable digital products.
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-[var(--color-soft)]">
+                Based in Dhaka and available for product engineering, frontend systems,
+                and full-stack delivery.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-white/50">
+              {navItems.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className="transition hover:text-[var(--color-accent)]"
+                >
+                  {item.label}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-4 border-t border-white/8 pt-5 text-sm text-white/35 md:flex-row md:items-center md:justify-between">
+            <p>© 2026 Nasimul Arafin Rounok. All rights reserved.</p>
+            <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/30">
+              Minimal by design. Built with Next.js and Framer Motion.
+            </p>
+          </div>
         </div>
       </footer>
+
+      <AnimatePresence>
+        {showBackToTop ? (
+          <motion.button
+            type="button"
+            aria-label="Back to top"
+            initial={{ opacity: 0, y: 16, scale: 0.92 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, scale: 0.92 }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{ y: -4 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="fixed bottom-6 right-6 z-[75] inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/12 bg-black/80 text-white shadow-[0_18px_40px_rgba(0,0,0,0.3)] backdrop-blur-xl transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+          >
+            <Icon name="arrowUp" className="h-5 w-5" />
+          </motion.button>
+        ) : null}
+      </AnimatePresence>
     </main>
   );
 }

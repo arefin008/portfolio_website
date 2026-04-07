@@ -12,13 +12,6 @@
   --font-mono: var(--font-ibm-plex-mono);
 }
 
-@theme inline {
-  --color-background: var(--color-page);
-  --color-foreground: var(--color-ink);
-  --font-sans: var(--font-space-grotesk);
-  --font-mono: var(--font-ibm-plex-mono);
-}
-
 * {
   box-sizing: border-box;
 }
@@ -181,13 +174,14 @@ textarea {
   }
 }
 
-@keyframes pulse {
+@keyframes status-ping {
   0% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.28;
+    transform: scale(1);
+    opacity: 0.75;
   }
+  75%,
   100% {
-    transform: translate(-50%, -50%) scale(3);
+    transform: scale(2.5);
     opacity: 0;
   }
 }

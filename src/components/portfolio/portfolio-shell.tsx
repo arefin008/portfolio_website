@@ -9,6 +9,7 @@ import {
   useReducedMotion,
   useScroll,
   useSpring,
+  useMotionValue,
   useTransform,
 } from "framer-motion";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -46,7 +47,6 @@ export function PortfolioShell() {
   const [typedText, setTypedText] = useState("");
   const [profilePhotoMissing, setProfilePhotoMissing] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const [projectsRailProgress, setProjectsRailProgress] = useState(0);
   const cursorDotRef = useRef<HTMLDivElement | null>(null);
   const cursorOutlineRef = useRef<HTMLDivElement | null>(null);
   const projectsSectionRef = useRef<HTMLElement | null>(null);
@@ -54,6 +54,7 @@ export function PortfolioShell() {
   const projectsRailTrackRef = useRef<HTMLDivElement | null>(null);
   const workSectionRef = useRef<HTMLElement | null>(null);
   const shouldReduceMotion = useReducedMotion();
+  const projectsRailProgress = useMotionValue(0);
   const { scrollY, scrollYProgress } = useScroll();
   const { scrollYProgress: workScrollProgress } = useScroll({
     target: workSectionRef,
@@ -95,7 +96,7 @@ export function PortfolioShell() {
       gsap.set(track, { x: 0 });
 
       if (maxTravel <= 0) {
-        setProjectsRailProgress(0);
+        projectsRailProgress.set(0);
         return;
       }
 
@@ -110,7 +111,7 @@ export function PortfolioShell() {
           scrub: 1,
           anticipatePin: 1,
           invalidateOnRefresh: true,
-          onUpdate: (self) => setProjectsRailProgress(self.progress),
+          onUpdate: (self) => projectsRailProgress.set(self.progress),
         },
       });
     }, section);
@@ -121,9 +122,9 @@ export function PortfolioShell() {
     return () => {
       window.removeEventListener("resize", handleRefresh);
       context.revert();
-      setProjectsRailProgress(0);
+      projectsRailProgress.set(0);
     };
-  }, [shouldReduceMotion]);
+  }, [projectsRailProgress, shouldReduceMotion]);
 
   useEffect(() => {
     let index = 0;
@@ -343,10 +344,11 @@ export function PortfolioShell() {
             {...fadeInUp}
             className="mb-8 inline-flex items-center gap-3 rounded-full border border-emerald-400/35 bg-emerald-400/10 px-4 py-2"
           >
-            <span className="relative inline-block h-2 w-2 rounded-full bg-[var(--color-accent)]">
+            <span className="relative flex h-3 w-3 items-center justify-center">
+              <span className="absolute inset-0 m-auto h-2.5 w-2.5 rounded-full bg-[var(--color-accent)]" />
               <span
-                className="absolute left-1/2 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--color-accent)]/30"
-                style={{ animation: "pulse 2s ease-out infinite" }}
+                className="absolute inset-0 m-auto h-2.5 w-2.5 rounded-full bg-[var(--color-accent)]/40"
+                style={{ animation: "status-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite" }}
               />
             </span>
             <span className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-emerald-300">
@@ -770,12 +772,14 @@ export function PortfolioShell() {
                           {project.stack}
                         </span>
                       </div>
-                      <h3 className="text-3xl font-black tracking-[-0.06em]">{project.name}</h3>
+                      <h3 className="text-[2rem] font-bold tracking-[-0.05em] text-white">
+                        {project.name}
+                      </h3>
                     </div>
                   </div>
 
                   <div className="flex flex-1 flex-col border-t border-white/8 bg-black/30 p-6">
-                    <p className="text-sm leading-7 text-[var(--color-muted)]">
+                    <p className="text-[15px] leading-7 text-[var(--color-muted)]">
                       {project.summary}
                     </p>
 
@@ -836,12 +840,14 @@ export function PortfolioShell() {
                           {project.stack}
                         </span>
                       </div>
-                      <h3 className="text-3xl font-black tracking-[-0.06em]">{project.name}</h3>
+                      <h3 className="text-[2rem] font-bold tracking-[-0.05em] text-white">
+                        {project.name}
+                      </h3>
                     </div>
                   </div>
 
                   <div className="flex flex-1 flex-col border-t border-white/8 bg-black/30 p-6">
-                    <p className="text-sm leading-7 text-[var(--color-muted)]">
+                    <p className="text-[15px] leading-7 text-[var(--color-muted)]">
                       {project.summary}
                     </p>
 

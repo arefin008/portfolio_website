@@ -1,0 +1,200 @@
+@import "tailwindcss";
+
+:root {
+  --color-page: #050505;
+  --color-panel: rgba(255, 255, 255, 0.03);
+  --color-line: rgba(255, 255, 255, 0.12);
+  --color-ink: #f6f5ef;
+  --color-muted: rgba(246, 245, 239, 0.62);
+  --color-soft: rgba(246, 245, 239, 0.42);
+  --color-accent: #3ddc97;
+  --font-sans: var(--font-space-grotesk);
+  --font-mono: var(--font-ibm-plex-mono);
+}
+
+@theme inline {
+  --color-background: var(--color-page);
+  --color-foreground: var(--color-ink);
+  --font-sans: var(--font-space-grotesk);
+  --font-mono: var(--font-ibm-plex-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-space-grotesk), sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(61, 220, 151, 0.12), transparent 28%),
+    radial-gradient(circle at 85% 20%, rgba(71, 135, 255, 0.12), transparent 24%),
+    linear-gradient(180deg, #030303 0%, #060606 100%);
+  color: var(--color-ink);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+::selection {
+  background: rgba(61, 220, 151, 0.22);
+  color: #ffffff;
+}
+
+.grid-shell {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+.noise-overlay {
+  position: relative;
+}
+
+.noise-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.08;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 3px 3px, 72px 72px;
+  mix-blend-mode: soft-light;
+}
+
+.parallax-orb {
+  will-change: transform;
+  transform: translate3d(0, calc(var(--scroll-y, 0px) * var(--parallax-speed, 0.12)), 0);
+}
+
+.parallax-band {
+  will-change: transform;
+  transform: translate3d(0, calc(var(--scroll-y, 0px) * var(--parallax-speed, -0.08)), 0);
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s ease;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.cursor-dot,
+.cursor-outline {
+  position: fixed;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  z-index: 80;
+  border-radius: 9999px;
+  transform: translate(-50%, -50%);
+}
+
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  background: #ffffff;
+}
+
+.cursor-outline {
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(61, 220, 151, 0.5);
+  background: rgba(61, 220, 151, 0.05);
+  transition:
+    width 0.2s ease,
+    height 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.cursor-outline.is-hovering {
+  width: 64px;
+  height: 64px;
+  background: rgba(61, 220, 151, 0.12);
+  border-color: rgba(61, 220, 151, 0.95);
+}
+
+.typing-caret {
+  display: inline-block;
+  width: 0.45rem;
+  height: 1em;
+  margin-left: 0.3rem;
+  vertical-align: text-bottom;
+  background: var(--color-accent);
+  animation: blink 1s step-end infinite;
+}
+
+.glass-panel {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.section-divider {
+  background:
+    linear-gradient(90deg, transparent, rgba(61, 220, 151, 0.45), transparent);
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.28;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(3);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .cursor-dot,
+  .cursor-outline {
+    display: none;
+  }
+}

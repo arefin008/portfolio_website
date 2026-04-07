@@ -109,3 +109,19 @@
 
 - `src/app/globals.css`
   CSS keyframes and non-JavaScript visual effects such as the caret blink and pulse.
+
+## Contact Form Setup
+
+- Frontend form logic lives in `src/components/portfolio/portfolio-shell.tsx`.
+- Server handler lives in `src/app/api/contact/route.ts`.
+- Email delivery uses the Resend HTTP API.
+
+Required environment variables:
+
+- `RESEND_API_KEY`
+- `CONTACT_TO_EMAIL`
+- `CONTACT_FROM_EMAIL` optional
+
+Starter template:
+
+- `.env.example`

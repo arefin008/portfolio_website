@@ -25,6 +25,7 @@ import {
   workHistory,
 } from "@/components/portfolio/data";
 import { Icon } from "@/components/portfolio/icons";
+import { contactFormSchema, type ContactFormValues } from "@/lib/contact-schema";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 48 },
@@ -39,6 +40,8 @@ const workItemMotion = {
   viewport: { once: true, amount: 0.2 },
 } as const;
 
+const resumeHref = "/resume.pdf";
+
 export function PortfolioShell() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeIdentity, setActiveIdentity] = useState<string>(identityTabs[0].id);
@@ -47,6 +50,18 @@ export function PortfolioShell() {
   const [typedText, setTypedText] = useState("");
   const [profilePhotoMissing, setProfilePhotoMissing] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
+  const [contactMessage, setContactMessage] = useState("");
+  const [contactBotField, setContactBotField] = useState("");
+  const [contactStatus, setContactStatus] = useState<"idle" | "loading" | "success" | "error">(
+    "idle",
+  );
+  const [contactFeedback, setContactFeedback] = useState("");
+  const [contactErrors, setContactErrors] = useState<
+    Partial<Record<keyof ContactFormValues, string>>
+  >({});
   const cursorDotRef = useRef<HTMLDivElement | null>(null);
   const cursorOutlineRef = useRef<HTMLDivElement | null>(null);
   const projectsSectionRef = useRef<HTMLElement | null>(null);
@@ -257,6 +272,90 @@ export function PortfolioShell() {
   const activeIdentityTab =
     identityTabs.find((tab) => tab.id === activeIdentity) ?? identityTabs[0];
 
+  const getLinkProps = (href: string) =>
+    href.startsWith("http")
+      ? { target: "_blank" as const, rel: "noreferrer" }
+      : {};
+
+  const handleContactSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const validationResult = contactFormSchema.safeParse({
+      name: contactName,
+      email: contactEmail,
+      phone: contactPhone,
+      message: contactMessage,
+      website: contactBotField,
+    });
+
+    if (!validationResult.success) {
+      const fieldErrors = validationResult.error.flatten().fieldErrors;
+      setContactErrors({
+        name: fieldErrors.name?.[0],
+        email: fieldErrors.email?.[0],
+        phone: fieldErrors.phone?.[0],
+        message: fieldErrors.message?.[0],
+        website: fieldErrors.website?.[0],
+      });
+      setContactStatus("error");
+      setContactFeedback("Please correct the highlighted fields.");
+      return;
+    }
+
+    setContactErrors({});
+
+    setContactStatus("loading");
+    setContactFeedback("Sending your message...");
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: contactName,
+          email: contactEmail,
+          phone: contactPhone,
+          message: contactMessage,
+          website: contactBotField,
+        }),
+      });
+
+      const result = (await response.json()) as {
+        error?: string;
+        message?: string;
+        fieldErrors?: Partial<Record<keyof ContactFormValues, string[]>>;
+      };
+
+      if (!response.ok) {
+        if (result.fieldErrors) {
+          setContactErrors({
+            name: result.fieldErrors.name?.[0],
+            email: result.fieldErrors.email?.[0],
+            phone: result.fieldErrors.phone?.[0],
+            message: result.fieldErrors.message?.[0],
+            website: result.fieldErrors.website?.[0],
+          });
+        }
+        throw new Error(result.error ?? "Unable to send message right now.");
+      }
+
+      setContactStatus("success");
+      setContactFeedback(result.message ?? "Message sent successfully.");
+      setContactErrors({});
+      setContactName("");
+      setContactEmail("");
+      setContactPhone("");
+      setContactMessage("");
+      setContactBotField("");
+    } catch (error) {
+      setContactStatus("error");
+      setContactFeedback(
+        error instanceof Error ? error.message : "Unable to send message right now.",
+      );
+    }
+  };
+
   return (
     <main className="noise-overlay relative overflow-hidden bg-[var(--color-page)] text-[var(--color-ink)]">
       <motion.div
@@ -267,13 +366,13 @@ export function PortfolioShell() {
       <div ref={cursorOutlineRef} className="cursor-outline" />
 
       <header className="fixed inset-x-0 top-0 z-50 border-b border-white/6 bg-black/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-12">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 sm:py-5 lg:px-12">
           <div className="flex flex-col">
-            <span className="text-lg font-extrabold uppercase tracking-[-0.04em]">
+            <span className="text-base font-extrabold uppercase tracking-[-0.04em] sm:text-lg">
               Nasimul Arafin Rounok
             </span>
-            <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
-              Full Stack Engineer
+            <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[var(--color-accent)] sm:text-[10px] sm:tracking-[0.22em]">
+              Software Engineer
             </span>
           </div>
 
@@ -305,7 +404,7 @@ export function PortfolioShell() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="overflow-hidden border-t border-white/6 bg-black/95 px-6 md:hidden"
+              className="overflow-hidden border-t border-white/6 bg-black/95 px-4 sm:px-6 md:hidden"
             >
               <div className="flex flex-col gap-4 py-5">
                 {navItems.map((item) => (
@@ -352,7 +451,7 @@ export function PortfolioShell() {
               />
             </span>
             <span className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-emerald-300">
-              Online <span className="mx-1 text-white/25">//</span> Dhaka, BD
+              Available <span className="mx-1 text-white/25">//</span> Dhaka, Bangladesh
             </span>
           </motion.div>
 
@@ -370,13 +469,13 @@ export function PortfolioShell() {
             transition={{ ...fadeInUp.transition, delay: 0.16 }}
             className="mt-6 max-w-2xl text-lg font-medium leading-8 text-[var(--color-soft)] md:text-xl"
           >
-            Architecting performance-critical applications with modern web technologies, product instincts, and systems that still feel human.
+            Skilled in React, Next.js, ASP.NET, Node.js, and database-backed application development with a focus on responsive interfaces and clean implementation.
           </motion.p>
 
           <motion.div
             {...fadeInUp}
             transition={{ ...fadeInUp.transition, delay: 0.24 }}
-            className="mt-10 flex flex-col gap-4 sm:flex-row"
+            className="mt-10 flex flex-col gap-4 sm:flex-row sm:flex-wrap"
           >
             <motion.a
               href="#projects"
@@ -388,12 +487,16 @@ export function PortfolioShell() {
               View Projects
             </motion.a>
             <motion.a
-              href="#contact"
+              href={resumeHref}
+              target="_blank"
+              rel="noreferrer"
+              download
               whileHover={{ y: -4 }}
               whileTap={{ scale: 0.98 }}
-              className="rounded-sm border border-white/25 px-8 py-4 font-mono text-xs font-bold uppercase tracking-[0.18em] text-white transition hover:-translate-y-0.5 hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+              className="inline-flex items-center justify-center gap-2 rounded-sm border border-emerald-400/35 bg-emerald-400/10 px-8 py-4 font-mono text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-accent)] transition hover:-translate-y-0.5 hover:border-emerald-300 hover:bg-emerald-400/16"
             >
-              Contact Me
+              Download Resume
+              <Icon name="externalLink" className="h-4 w-4" />
             </motion.a>
           </motion.div>
 
@@ -403,9 +506,9 @@ export function PortfolioShell() {
             className="mt-12 grid max-w-2xl gap-4 sm:grid-cols-3"
           >
             {[
-              { label: "Years Building", value: "4+" },
-              { label: "Projects Shipped", value: "20+" },
-              { label: "Stack Range", value: "Full" },
+              { label: "Projects Built", value: "7+" },
+              { label: "Core Focus", value: "Full Stack" },
+              { label: "Degree", value: "CSE" },
             ].map((item) => (
               <div key={item.label} className="glass-panel rounded-[1.25rem] p-4">
                 <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/45">
@@ -424,7 +527,7 @@ export function PortfolioShell() {
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.9, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="hidden lg:block"
+            className="mx-auto w-full max-w-sm sm:max-w-xl lg:mx-0 lg:max-w-none"
           >
             <div className="glass-panel overflow-hidden rounded-[2rem]">
               {!profilePhotoMissing ? (
@@ -432,13 +535,13 @@ export function PortfolioShell() {
                   <img
                     src="/profile-photo.jpg"
                     alt="Professional portrait"
-                    className="h-[34rem] w-full object-cover"
+                    className="h-[22rem] w-full object-cover object-center sm:h-[28rem] lg:h-[34rem]"
                     onError={() => setProfilePhotoMissing(true)}
                   />
                   <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.02),rgba(0,0,0,0.18)_72%,rgba(0,0,0,0.38))]" />
                 </div>
               ) : (
-                <div className="relative flex h-[34rem] items-end overflow-hidden bg-[radial-gradient(circle_at_top,rgba(61,220,151,0.12),transparent_42%),linear-gradient(180deg,#111111_0%,#090909_100%)] p-8">
+                <div className="relative flex h-[22rem] items-end overflow-hidden bg-[radial-gradient(circle_at_top,rgba(61,220,151,0.12),transparent_42%),linear-gradient(180deg,#111111_0%,#090909_100%)] p-6 sm:h-[28rem] sm:p-8 lg:h-[34rem]">
                   <div className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(61,220,151,0.55),transparent)]" />
                   <div className="absolute right-[-3rem] top-[-2rem] h-40 w-40 rounded-full bg-emerald-400/10 blur-3xl" />
                   <div className="relative flex items-center gap-4">
@@ -461,7 +564,7 @@ export function PortfolioShell() {
 
       <div className="section-divider mx-auto h-px max-w-7xl opacity-50" />
 
-      <section id="identity" className="mx-auto max-w-7xl px-6 py-24 lg:px-12">
+      <section id="identity" className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-12">
         <motion.div {...fadeInUp} className="mb-12">
           <p className="mb-4 flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-[0.24em] text-[var(--color-accent)]">
             <Icon name="fingerprint" className="h-4 w-4" />
@@ -509,7 +612,7 @@ export function PortfolioShell() {
           </motion.div>
 
           <motion.div {...fadeInUp} className="lg:col-span-8">
-            <div className="glass-panel overflow-hidden rounded-[1.75rem] p-8">
+            <div className="glass-panel overflow-hidden rounded-[1.75rem] p-6 sm:p-8">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeIdentityTab.id}
@@ -527,7 +630,7 @@ export function PortfolioShell() {
                   <p className="mt-3 font-mono text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-accent)]">
                     {activeIdentityTab.strap}
                   </p>
-                  <p className="mt-6 max-w-3xl leading-8 text-[var(--color-muted)]">
+                  <p className="mt-6 max-w-3xl leading-7 sm:leading-8 text-[var(--color-muted)]">
                     {activeIdentityTab.body}
                   </p>
 
@@ -552,12 +655,12 @@ export function PortfolioShell() {
         </div>
       </section>
 
-      <section id="expertise" className="relative overflow-hidden bg-black/40 py-24">
+      <section id="expertise" className="relative overflow-hidden bg-black/40 py-20 sm:py-24">
         <div
           className="parallax-orb absolute right-0 top-10 h-80 w-80 rounded-full bg-emerald-400/6 blur-3xl"
           style={{ ["--parallax-speed" as string]: "0.05" }}
         />
-        <div className="mx-auto grid max-w-7xl gap-12 px-6 lg:grid-cols-12 lg:px-12">
+        <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-12 lg:px-12">
           <motion.div {...fadeInUp} className="lg:col-span-4">
             <p className="mb-4 flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-[0.24em] text-[var(--color-accent)]">
               <Icon name="grid" className="h-4 w-4" />
@@ -604,7 +707,7 @@ export function PortfolioShell() {
                   <button
                     type="button"
                     onClick={() => setOpenModule(isOpen ? "" : module.id)}
-                    className="flex w-full items-center justify-between gap-4 p-6 text-left"
+                    className="flex w-full flex-col items-start justify-between gap-4 p-5 text-left sm:flex-row sm:items-center sm:p-6"
                   >
                     <div className="flex items-center gap-4">
                       <div className="rounded-xl bg-white/5 p-3 text-white/70">
@@ -624,7 +727,11 @@ export function PortfolioShell() {
                         </div>
                       </div>
                     </div>
-                    <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.3 }}>
+                    <motion.div
+                      animate={{ rotate: isOpen ? 180 : 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="self-end sm:self-auto"
+                    >
                       <Icon name="chevronDown" className="h-5 w-5 text-white/40" />
                     </motion.div>
                   </button>
@@ -661,7 +768,7 @@ export function PortfolioShell() {
         </div>
       </section>
 
-      <section id="services" className="mx-auto max-w-7xl px-6 py-24 lg:px-12">
+      <section id="services" className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-12">
         <motion.div {...fadeInUp} className="mb-16">
           <h2 className="text-4xl font-bold tracking-[-0.05em] md:text-6xl">
             Capabilities<span className="text-[var(--color-accent)]">.</span>
@@ -711,22 +818,25 @@ export function PortfolioShell() {
         </div>
       </section>
 
-      <section id="projects" ref={projectsSectionRef} className="overflow-hidden bg-black/40 py-24 md:py-0">
-        <div className="mx-auto max-w-7xl px-6 lg:px-12 md:flex md:h-screen md:flex-col md:justify-center">
+      <section
+        id="projects"
+        ref={projectsSectionRef}
+        className="overflow-hidden bg-black/40 py-20 sm:py-24 md:py-0"
+      >
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-12 md:flex md:h-screen md:flex-col md:justify-center">
           <motion.div {...fadeInUp} className="mb-12 grid gap-12 lg:grid-cols-12 lg:items-end">
             <div className="lg:col-span-5">
               <h2 className="text-4xl font-bold tracking-[-0.05em] md:text-6xl">
                 Selected Works<span className="text-[var(--color-accent)]">.</span>
               </h2>
               <p className="mt-4 max-w-xl text-sm leading-7 text-[var(--color-soft)]">
-                A curated horizontal showcase of product work across healthcare,
-                commerce, travel, and operations systems.
+                Selected projects from frontend, backend, database, and academic application work.
               </p>
             </div>
             <div className="hidden lg:col-span-7 md:flex md:items-end md:justify-end">
               <div className="w-full max-w-sm">
                 <div className="mb-3 flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.18em] text-white/35">
-                  <span>Horizontal Scroll</span>
+                  <span>Project Archive</span>
                   <span>{projects.length} projects</span>
                 </div>
                 <div className="h-px overflow-hidden bg-white/10">
@@ -786,21 +896,14 @@ export function PortfolioShell() {
                     <div className="mt-auto pt-6">
                       <div className="flex flex-wrap gap-3">
                         <motion.a
-                          href="#"
+                          href={project.repoUrl}
+                          target="_blank"
+                          rel="noreferrer"
                           whileHover={{ y: -3 }}
                           whileTap={{ scale: 0.98 }}
                           className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/14 px-4 py-2 text-xs font-bold text-white shadow-[0_10px_24px_rgba(0,0,0,0.18)] transition hover:border-white/32 hover:bg-white/20"
                         >
-                          View Project <Icon name="externalLink" className="h-3.5 w-3.5" />
-                        </motion.a>
-                        <motion.a
-                          href="#"
-                          whileHover={{ y: -3 }}
-                          whileTap={{ scale: 0.98 }}
-                          className="inline-flex items-center gap-2 rounded-full border border-white/16 bg-black/20 px-4 py-2 text-xs font-bold text-white/88 transition hover:border-emerald-400/45 hover:bg-emerald-400/8 hover:text-[var(--color-accent)]"
-                        >
-                          <Icon name="github" className="h-3.5 w-3.5" />
-                          Source
+                          GitHub Repository <Icon name="externalLink" className="h-3.5 w-3.5" />
                         </motion.a>
                       </div>
                     </div>
@@ -812,7 +915,7 @@ export function PortfolioShell() {
           </div>
 
           <div className="relative md:hidden">
-            <div className="hide-scrollbar flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4">
+            <div className="hide-scrollbar -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 sm:-mx-6 sm:px-6">
               {projects.map((project, index) => (
                 <motion.article
                   key={project.name}
@@ -822,10 +925,10 @@ export function PortfolioShell() {
                   viewport={{ once: true, amount: 0.2 }}
                   transition={{ delay: index * 0.06, duration: 0.65 }}
                   whileHover={{ y: -8 }}
-                  className="glass-panel group flex min-h-[31rem] min-w-[86%] snap-start flex-col overflow-hidden rounded-[1.75rem]"
+                  className="glass-panel group flex min-h-[29rem] w-[min(22rem,88vw)] shrink-0 snap-start flex-col overflow-hidden rounded-[1.5rem] sm:min-h-[31rem] sm:w-[min(24rem,82vw)] sm:rounded-[1.75rem]"
                 >
                   <div
-                    className={`relative flex h-64 items-end overflow-hidden bg-gradient-to-br ${project.gradient} p-6`}
+                    className={`relative flex h-56 items-end overflow-hidden bg-gradient-to-br p-5 sm:h-64 sm:p-6 ${project.gradient}`}
                   >
                     <motion.div
                       whileHover={{ scale: 1.04 }}
@@ -840,35 +943,28 @@ export function PortfolioShell() {
                           {project.stack}
                         </span>
                       </div>
-                      <h3 className="text-[2rem] font-bold tracking-[-0.05em] text-white">
+                      <h3 className="text-[1.75rem] font-bold tracking-[-0.05em] text-white sm:text-[2rem]">
                         {project.name}
                       </h3>
                     </div>
                   </div>
 
-                  <div className="flex flex-1 flex-col border-t border-white/8 bg-black/30 p-6">
-                    <p className="text-[15px] leading-7 text-[var(--color-muted)]">
+                  <div className="flex flex-1 flex-col border-t border-white/8 bg-black/30 p-5 sm:p-6">
+                    <p className="text-sm leading-7 text-[var(--color-muted)] sm:text-[15px]">
                       {project.summary}
                     </p>
 
                     <div className="mt-auto pt-6">
-                      <div className="flex flex-wrap gap-3">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                         <motion.a
-                          href="#"
+                          href={project.repoUrl}
+                          target="_blank"
+                          rel="noreferrer"
                           whileHover={{ y: -3 }}
                           whileTap={{ scale: 0.98 }}
-                          className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/14 px-4 py-2 text-xs font-bold text-white shadow-[0_10px_24px_rgba(0,0,0,0.18)] transition hover:border-white/32 hover:bg-white/20"
+                          className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/14 px-4 py-2 text-xs font-bold text-white shadow-[0_10px_24px_rgba(0,0,0,0.18)] transition hover:border-white/32 hover:bg-white/20"
                         >
-                          View Project <Icon name="externalLink" className="h-3.5 w-3.5" />
-                        </motion.a>
-                        <motion.a
-                          href="#"
-                          whileHover={{ y: -3 }}
-                          whileTap={{ scale: 0.98 }}
-                          className="inline-flex items-center gap-2 rounded-full border border-white/16 bg-black/20 px-4 py-2 text-xs font-bold text-white/88 transition hover:border-emerald-400/45 hover:bg-emerald-400/8 hover:text-[var(--color-accent)]"
-                        >
-                          <Icon name="github" className="h-3.5 w-3.5" />
-                          Source
+                          GitHub Repository <Icon name="externalLink" className="h-3.5 w-3.5" />
                         </motion.a>
                       </div>
                     </div>
@@ -883,14 +979,14 @@ export function PortfolioShell() {
       <section
         id="work"
         ref={workSectionRef}
-        className="mx-auto max-w-6xl px-6 py-24 lg:px-12"
+        className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24 lg:px-12"
       >
         <motion.div {...fadeInUp} className="mb-16 text-center">
           <h2 className="text-4xl font-bold tracking-[-0.05em] md:text-5xl">
-            Work History<span className="text-[var(--color-accent)]">.</span>
+            Experience<span className="text-[var(--color-accent)]">.</span>
           </h2>
           <p className="mt-4 text-[var(--color-soft)]">
-            Roles shaped across product engineering, platform delivery, and team execution.
+            Resume-backed professional experience and internship history.
           </p>
         </motion.div>
 
@@ -908,14 +1004,14 @@ export function PortfolioShell() {
                 key={`${item.company}-${item.period}`}
                 {...workItemMotion}
                 transition={{ duration: 0.7, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
-                className="relative grid grid-cols-[auto_1fr] gap-5 md:grid-cols-[1fr_auto_1fr] md:gap-8"
+                className="relative grid grid-cols-[auto_1fr] gap-4 sm:gap-5 md:grid-cols-[1fr_auto_1fr] md:gap-8"
               >
                 <div className="hidden md:block md:order-1">
                   {leftCard ? (
                     <motion.article
                       whileHover={{ y: -6 }}
                       transition={{ duration: 0.2 }}
-                      className="glass-panel relative mr-10 overflow-hidden rounded-[1.75rem] p-7"
+                      className="glass-panel relative mr-6 overflow-hidden rounded-[1.75rem] p-6 lg:mr-10 lg:p-7"
                     >
                       <div className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(61,220,151,0.7),transparent)]" />
                       <div className="flex items-start justify-between gap-5">
@@ -958,7 +1054,7 @@ export function PortfolioShell() {
                 </div>
 
                 <div className="relative z-10 flex justify-center md:order-2">
-                  <div className="mt-8 flex h-10 w-10 items-center justify-center rounded-full border border-emerald-400/35 bg-black shadow-[0_0_0_6px_rgba(5,5,5,1)]">
+                  <div className="mt-7 flex h-9 w-9 items-center justify-center rounded-full border border-emerald-400/35 bg-black shadow-[0_0_0_5px_rgba(5,5,5,1)] sm:mt-8 sm:h-10 sm:w-10 sm:shadow-[0_0_0_6px_rgba(5,5,5,1)]">
                     <motion.span
                       whileInView={{ scale: [0.8, 1.1, 1] }}
                       viewport={{ once: true, amount: 0.7 }}
@@ -972,8 +1068,8 @@ export function PortfolioShell() {
                   <motion.article
                     whileHover={{ y: -6 }}
                     transition={{ duration: 0.2 }}
-                    className={`glass-panel relative overflow-hidden rounded-[1.75rem] p-6 md:p-7 ${
-                      leftCard ? "md:hidden" : "md:ml-10"
+                    className={`glass-panel relative overflow-hidden rounded-[1.75rem] p-5 sm:p-6 md:p-7 ${
+                      leftCard ? "md:hidden" : "md:ml-6 lg:ml-10"
                     }`}
                   >
                     <div className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(61,220,151,0.7),transparent)]" />
@@ -985,7 +1081,7 @@ export function PortfolioShell() {
                         <h3 className="mt-2 text-2xl font-bold tracking-[-0.04em]">{item.role}</h3>
                         <p className="mt-2 text-sm text-white/55">{item.model}</p>
                       </div>
-                      <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/8 px-3 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-300">
+                      <div className="inline-flex w-fit items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/8 px-3 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-300">
                         <Icon name="calendar" className="h-3.5 w-3.5" />
                         {item.period}
                       </div>
@@ -1019,8 +1115,8 @@ export function PortfolioShell() {
         </div>
       </section>
 
-      <section className="bg-black/40 py-24">
-        <div className="mx-auto max-w-7xl px-6 lg:px-12">
+      <section className="bg-black/40 py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-12">
           <motion.div
             {...fadeInUp}
             className="glass-panel relative overflow-hidden rounded-[2rem] p-8 md:p-10"
@@ -1053,13 +1149,12 @@ export function PortfolioShell() {
                 </p>
 
                 <p className="mt-5 max-w-2xl leading-8 text-[var(--color-soft)]">
-                  Built a strong foundation in software architecture, advanced algorithms,
-                  systems thinking, and implementation discipline with an emphasis on
-                  scalable engineering and practical problem solving.
+                  Completed a B.Sc. in CSE with a major in Software Engineering and
+                  supporting study in advanced database systems and machine learning.
                 </p>
 
                 <div className="mt-8 flex flex-wrap gap-3">
-                  {["Software Architecture", "Distributed Systems", "Algorithms"].map((item) => (
+                  {["Software Engineering", "Advanced DBMS", "Machine Learning"].map((item) => (
                     <span
                       key={item}
                       className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-xs font-mono uppercase tracking-[0.16em] text-white/55"
@@ -1116,7 +1211,7 @@ export function PortfolioShell() {
         </div>
       </section>
 
-      <section className="relative mx-auto max-w-7xl overflow-hidden px-6 py-24 lg:px-12">
+      <section className="relative mx-auto max-w-7xl overflow-hidden px-4 py-20 sm:px-6 sm:py-24 lg:px-12">
         <div
           className="parallax-orb absolute left-[-8rem] top-8 h-64 w-64 rounded-full bg-fuchsia-500/8 blur-3xl"
           style={{ ["--parallax-speed" as string]: "0.1" }}
@@ -1142,7 +1237,7 @@ export function PortfolioShell() {
                 viewport={{ once: true, amount: 0.15 }}
                 transition={{ delay: index * 0.08 }}
                 whileHover={{ y: -8 }}
-                className={`reveal group relative overflow-hidden rounded-[1.5rem] border p-8 transition ${
+                className={`reveal group relative overflow-hidden rounded-[1.5rem] border p-6 sm:p-8 transition ${
                   isActive
                     ? "glass-panel border-[var(--color-accent)]"
                     : "border-white/10 bg-white/[0.03] hover:border-white/20"
@@ -1182,8 +1277,8 @@ export function PortfolioShell() {
         </div>
       </section>
 
-      <section id="contact" className="bg-black/40 py-24">
-        <div className="mx-auto grid max-w-7xl gap-16 px-6 lg:grid-cols-2 lg:px-12">
+      <section id="contact" className="bg-black/40 py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:gap-16 sm:px-6 lg:grid-cols-2 lg:px-12">
           <motion.div {...fadeInUp}>
             <h2 className="text-4xl font-bold tracking-[-0.05em] md:text-5xl">
               Let&apos;s Build
@@ -1192,8 +1287,8 @@ export function PortfolioShell() {
               Something Great.
             </h2>
             <p className="mt-6 max-w-md text-[var(--color-soft)]">
-              Open to product work, engineering partnerships, and technical
-              consulting.
+              Open to software engineering opportunities where I can contribute,
+              learn quickly, and keep building strong web applications.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-4">
@@ -1202,6 +1297,7 @@ export function PortfolioShell() {
                   key={link.label}
                   href={link.href}
                   aria-label={link.label}
+                  {...getLinkProps(link.href)}
                   whileHover={{ y: -4, rotate: 4 }}
                   whileTap={{ scale: 0.96 }}
                   className="glass-panel flex h-12 w-12 items-center justify-center rounded-full text-white/60 transition hover:text-[var(--color-accent)]"
@@ -1213,42 +1309,95 @@ export function PortfolioShell() {
           </motion.div>
 
           <motion.div {...fadeInUp}>
-            <div className="glass-panel rounded-[1.75rem] p-8">
+            <div className="glass-panel rounded-[1.75rem] p-6 sm:p-8">
               <div className="mb-6">
                 <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/45">
                   Start a conversation
                 </p>
               </div>
-              <form className="space-y-6">
+              <form className="space-y-6" onSubmit={handleContactSubmit}>
               <input
                 type="text"
                 placeholder="Your Name"
+                value={contactName}
+                onChange={(event) => {
+                  setContactName(event.target.value);
+                  setContactErrors((current) => ({ ...current, name: undefined }));
+                }}
                 className="w-full border-0 border-b border-white/15 bg-transparent px-0 py-4 text-white outline-none placeholder:text-white/30 focus:border-[var(--color-accent)]"
               />
+              {contactErrors.name ? (
+                <p className="-mt-3 text-sm text-rose-300">{contactErrors.name}</p>
+              ) : null}
               <input
                 type="email"
                 placeholder="Email Address"
+                value={contactEmail}
+                onChange={(event) => {
+                  setContactEmail(event.target.value);
+                  setContactErrors((current) => ({ ...current, email: undefined }));
+                }}
                 className="w-full border-0 border-b border-white/15 bg-transparent px-0 py-4 text-white outline-none placeholder:text-white/30 focus:border-[var(--color-accent)]"
               />
+              {contactErrors.email ? (
+                <p className="-mt-3 text-sm text-rose-300">{contactErrors.email}</p>
+              ) : null}
               <input
                 type="tel"
                 placeholder="Phone Number"
+                value={contactPhone}
+                onChange={(event) => {
+                  setContactPhone(event.target.value);
+                  setContactErrors((current) => ({ ...current, phone: undefined }));
+                }}
                 className="w-full border-0 border-b border-white/15 bg-transparent px-0 py-4 text-white outline-none placeholder:text-white/30 focus:border-[var(--color-accent)]"
+              />
+              {contactErrors.phone ? (
+                <p className="-mt-3 text-sm text-rose-300">{contactErrors.phone}</p>
+              ) : null}
+              <input
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                value={contactBotField}
+                onChange={(event) => setContactBotField(event.target.value)}
+                className="hidden"
               />
               <textarea
                 rows={4}
                 placeholder="Project Details"
+                value={contactMessage}
+                onChange={(event) => {
+                  setContactMessage(event.target.value);
+                  setContactErrors((current) => ({ ...current, message: undefined }));
+                }}
                 className="w-full resize-none border-0 border-b border-white/15 bg-transparent px-0 py-4 text-white outline-none placeholder:text-white/30 focus:border-[var(--color-accent)]"
               />
-              <div className="flex items-center justify-between pt-2">
+              {contactErrors.message ? (
+                <p className="-mt-3 text-sm text-rose-300">{contactErrors.message}</p>
+              ) : null}
+              <p
+                className={`text-sm ${
+                  contactStatus === "error"
+                    ? "text-rose-300"
+                    : contactStatus === "success"
+                      ? "text-emerald-300"
+                      : "text-white/45"
+                }`}
+              >
+                {contactFeedback || "Replies are sent directly to my inbox."}
+              </p>
+              <div className="flex flex-col gap-4 pt-2 sm:flex-row sm:items-center sm:justify-between">
                 <span className="font-mono text-sm font-semibold uppercase tracking-[0.18em]">
-                  Send Message
+                  {contactStatus === "loading" ? "Sending..." : "Send Message"}
                 </span>
                 <motion.button
                   type="submit"
                   whileHover={{ x: 3, scale: 1.04 }}
                   whileTap={{ scale: 0.97 }}
-                  className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-accent)] text-black transition hover:bg-emerald-300"
+                  disabled={contactStatus === "loading"}
+                  className="flex h-12 w-12 self-start items-center justify-center rounded-full bg-[var(--color-accent)] text-black transition hover:bg-emerald-300 sm:self-auto"
                 >
                   <Icon name="arrowRight" className="h-5 w-5" />
                 </motion.button>
@@ -1260,18 +1409,18 @@ export function PortfolioShell() {
       </section>
 
       <footer className="border-t border-white/8 bg-black/55">
-        <div className="mx-auto flex max-w-7xl flex-col gap-10 px-6 py-12 lg:px-12">
+        <div className="mx-auto flex max-w-7xl flex-col gap-10 px-4 py-12 sm:px-6 lg:px-12">
           <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
             <div className="max-w-lg">
               <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
                 Nasimul Arafin Rounok
               </p>
               <h2 className="mt-3 text-2xl font-bold tracking-[-0.05em] text-white">
-                Full Stack Engineer building clean, scalable digital products.
+                Aspiring software engineer focused on modern, responsive web applications.
               </h2>
               <p className="mt-3 text-sm leading-7 text-[var(--color-soft)]">
-                Based in Dhaka and available for product engineering, frontend systems,
-                and full-stack delivery.
+                Based in Dhaka with a focus on frontend development, web application
+                engineering, and database-backed systems.
               </p>
             </div>
 

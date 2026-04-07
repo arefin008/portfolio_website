@@ -32,6 +32,19 @@ body {
   color: var(--color-ink);
 }
 
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+input,
+textarea,
+button {
+  min-width: 0;
+}
+
 a {
   color: inherit;
   text-decoration: none;

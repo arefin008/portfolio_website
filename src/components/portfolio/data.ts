@@ -1,5 +1,5 @@
 export const heroText =
-  "I don't just build websites. I engineer scalable digital systems.";
+  "Aspiring software engineer building modern, responsive, and efficient web applications.";
 
 export const navItems = [
   { label: "Expertise", href: "#expertise" },
@@ -15,13 +15,13 @@ export const identityTabs = [
     label: "Developer",
     icon: "terminal",
     code: "CORE_DEVELOPER",
-    strap: "Precision & Performance",
-    body: "I build deliberate interfaces and code paths that stay readable under pressure. Clean structure, semantic markup, and measurable performance are part of the implementation, not a clean-up step after it ships.",
+    strap: "Responsive & Maintainable",
+    body: "I focus on frontend implementation that is modern, responsive, and cleanly structured. React, Next.js, TypeScript, and practical UI systems are where I do my best work.",
     points: [
-      "Semantic HTML and modern CSS systems",
-      "Type-safe product logic with TypeScript",
-      "Component-driven implementation",
-      "Performance tuning around Core Web Vitals",
+      "Responsive layouts with React and Next.js",
+      "Semantic HTML, CSS, Tailwind, Bootstrap, and daisyUI",
+      "TypeScript-based component development",
+      "Maintainable frontend structure and clean code",
     ],
   },
   {
@@ -29,13 +29,13 @@ export const identityTabs = [
     label: "Engineer",
     icon: "cpu",
     code: "SYSTEM_ENGINEER",
-    strap: "Scalability & Architecture",
-    body: "I design backend and platform layers that survive change. That means service boundaries, auth flows, persistence design, and deployment pipelines that support growth instead of blocking it.",
+    strap: "APIs & Data Systems",
+    body: "My backend work centers on practical web application engineering: REST APIs, ASP.NET applications, Node.js services, and database-backed features built with reliable validation and clear structure.",
     points: [
-      "Microservices and serverless patterns",
-      "Database design and query optimization",
-      "API security and authentication",
-      "CI/CD workflow automation",
+      "RESTful API development with ASP.NET Web API",
+      "Node.js and TypeScript backend fundamentals",
+      "PostgreSQL, Prisma, Oracle PL/SQL, and MySQL",
+      "Authentication, validation, and CRUD-heavy systems",
     ],
   },
   {
@@ -43,13 +43,13 @@ export const identityTabs = [
     label: "Problem Solver",
     icon: "lightbulb",
     code: "LOGIC_SOLVER",
-    strap: "Analytics & Strategy",
-    body: "I decompose ambiguous requirements into tractable engineering problems, then choose the shortest path to a reliable result. Debugging, refactoring, and product tradeoffs all sit in the same decision loop.",
+    strap: "Learning & Problem Solving",
+    body: "I enjoy breaking real-world problems into workable systems, whether that means debugging application logic, improving data flow, or learning new tools quickly inside collaborative development environments.",
     points: [
-      "Algorithmic problem solving",
-      "Data-informed decision making",
-      "UX strategy grounded in behavior",
-      "Legacy system refactoring",
+      "Object-oriented programming and DSA foundations",
+      "Adaptable across frontend, backend, and database work",
+      "Collaborative teamwork and practical communication",
+      "Interest in machine learning and data analysis",
     ],
   },
 ] as const;
@@ -61,7 +61,7 @@ export const expertiseModules = [
     title: "Languages & Core",
     icon: "terminal",
     badge: "Optimized",
-    skills: ["TypeScript", "JavaScript", "Python", "Java", "PHP"],
+    skills: ["C++", "Java", "C#", "JavaScript", "PHP", "Python", "TypeScript"],
   },
   {
     id: "frontend",
@@ -70,12 +70,15 @@ export const expertiseModules = [
     icon: "globe",
     badge: null,
     skills: [
+      "HTML",
+      "CSS",
       "React",
       "Next.js",
       "Tailwind CSS",
       "Bootstrap",
       "DaisyUI",
-      "Framer Motion",
+      "Material UI",
+      "shadcn/ui",
     ],
   },
   {
@@ -86,11 +89,12 @@ export const expertiseModules = [
     badge: null,
     skills: [
       "Node.js",
-      "Express.js",
-      "NestJS",
-      "GraphQL",
-      "WebSockets",
-      "Microservices",
+      "ASP.NET",
+      "ASP.NET Web API",
+      "ASP.NET MVC",
+      "REST APIs",
+      "TypeScript",
+      "PHP",
     ],
   },
   {
@@ -98,8 +102,8 @@ export const expertiseModules = [
     number: "MODULE_04",
     title: "Data & Infrastructure",
     icon: "database",
-    badge: "Secure",
-    skills: ["PostgreSQL", "MySQL", "MongoDB", "Firebase", "Redis", "Docker"],
+    badge: "Structured",
+    skills: ["PostgreSQL", "Prisma", "Oracle", "PL/SQL", "MySQL", "SQL Server"],
   },
 ] as const;
 
@@ -109,148 +113,146 @@ export const capabilities = [
     icon: "code2",
     accent: "text-[var(--color-accent)]",
     description:
-      "Scalable, typed frontend systems with strong layout discipline and production-ready component architecture.",
-    tags: ["TypeScript", "JavaScript", "Tailwind CSS", "Bootstrap", "DaisyUI"],
+      "Modern responsive interfaces built with React, Next.js, TypeScript, and practical component patterns.",
+    tags: ["React", "Next.js", "TypeScript", "Tailwind CSS", "Bootstrap"],
   },
   {
-    title: "UI/UX Design",
+    title: "Interface Design",
     icon: "palette",
     accent: "text-[var(--color-accent)]",
     description:
-      "Interfaces that convert complexity into clarity without flattening the personality of the product.",
-    tags: ["Figma", "Design Systems"],
+      "UI work focused on clarity, responsiveness, and maintainable implementation rather than overdesigned complexity.",
+    tags: ["Figma", "Material UI", "daisyUI", "shadcn/ui"],
   },
   {
     title: "Backend Engine",
     icon: "database",
     accent: "text-white",
     description:
-      "Robust server-side systems across multiple stacks with reliable data layers and API design.",
-    tags: [
-      "Python",
-      "Node.js",
-      "Express.js",
-      "PHP",
-      "Java",
-      "PostgreSQL",
-      "MySQL",
-      "MongoDB",
-      "Firebase",
-    ],
+      "Backend and API development across Node.js and ASP.NET with validation-heavy, database-driven application logic.",
+    tags: ["Node.js", "ASP.NET", "REST API", "C#", "PHP", "TypeScript"],
   },
   {
-    title: "Mobile First",
+    title: "Database Work",
     icon: "smartphone",
     accent: "text-[var(--color-accent)]",
-    description: "Responsive implementation that remains fast and intentional on every screen size.",
-    tags: ["Responsive", "PWA"],
+    description: "Experience designing and querying relational data with Oracle, PostgreSQL, Prisma, MySQL, and SQL Server.",
+    tags: ["Oracle", "PL/SQL", "PostgreSQL", "Prisma", "MySQL"],
   },
   {
-    title: "Full Stack Systems",
+    title: "Software Foundations",
     icon: "layers",
     accent: "text-[var(--color-accent)]",
     description:
-      "End-to-end delivery from concept to deployment with infrastructure and release workflows included.",
-    tags: ["AWS", "Docker", "Terraform", "CI/CD", "Microservices"],
+      "Strong grounding in OOP, DSA, validation, and maintainable software structure across academic and project work.",
+    tags: ["OOP", "DSA", "Validation", "CRUD", "MVC"],
   },
   {
-    title: "Performance",
+    title: "Adaptability",
     icon: "zap",
     accent: "text-[var(--color-accent)]",
-    description: "Speed budgets, technical SEO, and web vitals work that holds up in production.",
-    tags: ["Core Vitals", "SEO"],
+    description: "Comfortable learning new stacks quickly and contributing across frontend, backend, testing, and documentation work.",
+    tags: ["Teamwork", "Testing", "MS Office", "Learning"],
   },
 ] as const;
 
 export const projects = [
   {
-    name: "MediWise",
-    category: "Healthcare Platform",
-    stack: "Next.js",
+    name: "Recipe Finder App",
+    category: "Frontend App",
+    stack: "HTML, CSS, Bootstrap, JavaScript",
     summary:
-      "Full-stack healthcare management platform with role-based portals, appointments, payments, and real-time messaging.",
+      "Recipe search application using a public API, live search, interactive DOM updates, highlighted keywords, and modal-based recipe details.",
     gradient: "from-emerald-900/25 to-blue-900/25",
+    repoUrl: "https://github.com/arefin008/DOM-with-API-Project-Assignment-4",
   },
   {
-    name: "Explorer Nature",
-    category: "Tourism Platform",
-    stack: "React",
+    name: "Simple React E-commerce App",
+    category: "E-commerce Frontend",
+    stack: "React, Context API, Tailwind CSS",
     summary:
-      "Premium travel experience showcasing Bangladesh and international tours with immersive discovery and booking flows.",
+      "Responsive single-page e-commerce frontend with product search, sorting, cart management, and modal product detail views.",
     gradient: "from-orange-900/25 to-yellow-900/25",
+    repoUrl: "https://github.com/arefin008/Assisgnment-5-E-commerce-App-with-react",
   },
   {
-    name: "EMS Admin Panel",
-    category: "Admin System",
-    stack: "React",
+    name: "Online Quiz System",
+    category: "Role-based Web App",
+    stack: "ASP.NET MVC, SQL Server",
     summary:
-      "Employee management interface for attendance, payroll, and performance tracking across operational teams.",
+      "Role-based quiz management application with CRUD operations, Entity Framework, DTOs, form validation, and user/admin authentication.",
     gradient: "from-fuchsia-900/25 to-pink-900/25",
+    repoUrl: "https://github.com/arefin008/OnlineQuizSystem-with-Asp-dot-net",
   },
   {
-    name: "MotoCare",
-    category: "Auto Marketplace",
-    stack: "Next.js",
+    name: "Shopping List App",
+    category: "Web API Project",
+    stack: "ASP.NET Web API, C#, HTML, CSS",
     summary:
-      "Automotive marketplace with role-based access, operational dashboards, and full-stack management workflows.",
+      "Categorized shopping list application with add, view, delete, status updates, sorting, price estimates, sharing, and filtering.",
     gradient: "from-sky-900/25 to-cyan-900/25",
+    repoUrl: "https://github.com/arefin008/ShoppingListApp-With-Asp-dot-net-Web-Api",
   },
   {
-    name: "EcoSwap",
-    category: "Sustainable Marketplace",
-    stack: "React Native",
+    name: "Product & Customer Management",
+    category: "Business Management System",
+    stack: "ASP.NET MVC, C#, SQL Server",
     summary:
-      "Community marketplace for swapping pre-loved goods and reducing waste through local, circular exchange.",
+      "Product and customer management system with DTOs, Entity Framework, strong validation rules, and reliable database communication.",
     gradient: "from-green-900/25 to-emerald-900/25",
+    repoUrl: "https://github.com/arefin008/ProductCustomerMamnagement-With-.Net-framework",
   },
   {
-    name: "Astro Commerce",
-    category: "E-commerce Interface",
-    stack: "Astro",
+    name: "LandVitality",
+    category: "Agriculture Platform",
+    stack: "PHP, MySQL, JavaScript",
     summary:
-      "High-performance commerce frontend engineered for strong SEO, speed, and tight content delivery.",
+      "MVC-style platform connecting farmers, consultants, and admins through multi-role workflows and agricultural support features.",
     gradient: "from-zinc-800 to-zinc-950",
+    repoUrl:
+      "https://github.com/arefin008/teaching-web-technologies-fall2023-2024-sec-e/tree/main/Final_Project/landvitality",
+  },
+  {
+    name: "Birth Record Management System",
+    category: "Database-focused System",
+    stack: "Oracle 10g, PL/SQL, Core PHP",
+    summary:
+      "Birth record database system focused on efficient retrieval, secure CRUD operations, and query optimization in an MVC-style structure.",
+    gradient: "from-violet-900/25 to-slate-950",
+    repoUrl: "https://github.com/arefin008/Advanced-Database-Management-System-Final-Project",
+  },
+  {
+    name: "Salary Prediction Using Data Analysis",
+    category: "Machine Learning Project",
+    stack: "Python, Pandas, Scikit-learn",
+    summary:
+      "Salary prediction workflow with data cleaning, feature engineering, EDA, Naive Bayes modeling, and train-test plus 10-fold validation.",
+    gradient: "from-amber-900/25 to-zinc-950",
+    repoUrl: "https://github.com/arefin008/Python_Project/tree/main/Final%20Term",
   },
 ] as const;
 
-export const workHistory = [
+export const workHistory: ReadonlyArray<{
+  period: string;
+  role: string;
+  company: string;
+  model: string;
+  side: "left" | "right";
+  bullets: readonly string[];
+}> = [
   {
-    period: "Nov 2025 - Present",
-    role: "Full Stack Developer",
-    company: "Bengal Tech Solutions",
-    model: "Remote",
+    period: "Internship",
+    role: "Web Development Intern",
+    company: "Trodad International LTD.",
+    model: "Professional Experience",
     side: "right",
     bullets: [
-      "Architecting enterprise full-stack applications across MERN and PERN stacks.",
-      "Designing high-performance REST APIs.",
-      "Leading distributed CI/CD workflows.",
+      "Worked in a professional web development environment while building practical implementation experience.",
+      "Applied frontend and backend fundamentals to real application work.",
+      "Strengthened collaboration habits, adaptability, and engineering discipline.",
     ],
   },
-  {
-    period: "Jul 2025 - Oct 2025",
-    role: "Software Engineer Intern",
-    company: "Jam Technologies",
-    model: "Hybrid",
-    side: "left",
-    bullets: [
-      "Built modular UI components for POS products.",
-      "Improved performance with substantially faster page loads.",
-      "Refactored legacy code into maintainable modules.",
-    ],
-  },
-  {
-    period: "2020 - 2023",
-    role: "Digital Lead Generation",
-    company: "Fiverr",
-    model: "Remote",
-    side: "right",
-    bullets: [
-      "Delivered 600+ freelance projects with strong client retention.",
-      "Managed a 15-person cross-functional team.",
-      "Built repeatable lead generation systems and workflows.",
-    ],
-  },
-] as const;
+];
 
 export const protocols = [
   {
@@ -260,7 +262,7 @@ export const protocols = [
     icon: "search",
     accent: "text-sky-400",
     glow: "bg-sky-500/12",
-    body: "I start by separating constraints, assumptions, and actual user requirements. The fastest implementation is usually the one with the clearest model of the problem.",
+    body: "I begin by understanding the actual problem, the expected user flow, and the data requirements before writing code.",
   },
   {
     id: "architect",
@@ -269,7 +271,7 @@ export const protocols = [
     icon: "penTool",
     accent: "text-[var(--color-accent)]",
     glow: "bg-emerald-500/12",
-    body: "The stack, boundaries, data flow, and rollout plan are chosen to support real product growth, not only the first release milestone.",
+    body: "I choose tools and structure based on the project scope, whether that means React on the frontend, ASP.NET for APIs, or a database-first approach.",
   },
   {
     id: "execute",
@@ -278,14 +280,17 @@ export const protocols = [
     icon: "rocket",
     accent: "text-fuchsia-400",
     glow: "bg-fuchsia-500/12",
-    body: "Implementation quality, testing discipline, performance, and user experience all need to survive contact with production traffic.",
+    body: "I aim for clean, maintainable implementation with validation, responsive behavior, and practical problem solving that holds up in real use.",
   },
 ] as const;
 
 export const socialLinks = [
-  { label: "GitHub", href: "#", icon: "github" },
-  { label: "LinkedIn", href: "#", icon: "linkedin" },
-  { label: "Facebook", href: "#", icon: "facebook" },
-  { label: "Phone", href: "#", icon: "phone" },
-  { label: "Mail", href: "#", icon: "mail" },
+  { label: "GitHub", href: "https://github.com/arefin008", icon: "github" },
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/nasimul-arafin-rounok/",
+    icon: "linkedin",
+  },
+  { label: "Phone", href: "tel:01707019447", icon: "phone" },
+  { label: "Mail", href: "mailto:arefinrounok@gmail.com", icon: "mail" },
 ] as const;

@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+PORTFOLIO_STACK_AND_ANIMATIONS.md
+
+.vercel

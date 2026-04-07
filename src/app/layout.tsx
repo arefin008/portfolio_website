@@ -14,9 +14,9 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Arafin Rounok | Full Stack Engineer",
+  title: "Nasimul Arafin Rounok | Software Engineer",
   description:
-    "Portfolio of Nasimul Arafin Rounok, a full stack engineer building scalable digital systems and performance-focused web applications.",
+    "Portfolio of Nasimul Arafin Rounok, a software engineer focused on responsive web applications, practical backend systems, and clean implementation.",
 };
 
 export default function RootLayout({

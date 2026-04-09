@@ -1,36 +1,144 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Portfolio Website
 
-## Getting Started
+A modern personal portfolio for Nasimul Arafin Rounok, built with Next.js, React, and TypeScript. The application presents a full stack developer profile through a responsive single-page interface with motion design, curated project showcases, experience highlights, and a production-ready contact workflow.
 
-First, run the development server:
+## Live URL
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+[https://portfolio-website-one-rouge-17.vercel.app/](https://portfolio-website-one-rouge-17.vercel.app/)
+
+## Highlights
+
+- Responsive portfolio experience across mobile, tablet, and desktop
+- Smooth scrolling with Lenis
+- Motion-driven interactions using Framer Motion and GSAP
+- Full stack project showcase with adaptive layouts
+- Contact form validation, spam protection, and email delivery
+- SEO-oriented metadata and generated app icons
+
+## Technology
+
+- Next.js 16
+- React 19
+- TypeScript
+- Tailwind CSS 4
+- Framer Motion
+- GSAP
+- Lenis
+- Zod
+
+## Application Structure
+
+```text
+src/
+  app/
+    api/contact/route.ts
+    apple-icon.tsx
+    icon.tsx
+    globals.css
+    layout.tsx
+    page.tsx
+  components/
+    portfolio/
+      data.ts
+      icons.tsx
+      portfolio-page.tsx
+      portfolio-shell.tsx
+  lib/
+    contact-schema.ts
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local Development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Install dependencies:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm install
+```
 
-## Learn More
+Run the development server:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Build for production:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+pnpm build
+```
 
-## Deploy on Vercel
+Start the production server:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+pnpm start
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Run linting:
+
+```bash
+pnpm lint
+```
+
+If you prefer npm, use the equivalent `npm run <script>` commands.
+
+## Environment Variables
+
+Copy `.env.example` to `.env` and configure the following values:
+
+```env
+NEXT_PUBLIC_SITE_URL=https://your-domain.com
+RESEND_API_KEY=your_resend_api_key
+CONTACT_TO_EMAIL=your-email@example.com
+CONTACT_FROM_EMAIL=Portfolio Contact <onboarding@resend.dev>
+```
+
+### Variable Reference
+
+- `NEXT_PUBLIC_SITE_URL`: public site URL used for canonical and social metadata
+- `RESEND_API_KEY`: Resend API key for contact form email delivery
+- `CONTACT_TO_EMAIL`: recipient address for contact submissions
+- `CONTACT_FROM_EMAIL`: verified sender used when sending contact emails
+
+## Contact Form
+
+The contact form is implemented with a Next.js route handler at `src/app/api/contact/route.ts`.
+
+It includes:
+
+- Zod-based request validation
+- honeypot spam prevention
+- basic IP-based rate limiting
+- Resend email delivery
+
+If email configuration is missing, the route returns a controlled configuration error instead of attempting to send.
+
+## Content Management
+
+Most portfolio content is maintained in `src/components/portfolio/data.ts`, including:
+
+- hero copy
+- navigation labels
+- identity tabs
+- expertise modules
+- capabilities
+- project entries
+- work history
+
+Primary layout, animation, and responsive behavior are implemented in `src/components/portfolio/portfolio-shell.tsx`.
+
+## SEO and Icons
+
+SEO metadata is configured in `src/app/layout.tsx`.
+
+App icons are generated through:
+
+- `src/app/icon.tsx`
+- `src/app/apple-icon.tsx`
+
+For production deployment, set `NEXT_PUBLIC_SITE_URL` so canonical URLs and social preview metadata resolve correctly.
+
+## Notes
+
+- The contact rate limiter uses in-memory storage and is reset when the server restarts.
+- This repository is designed as a portfolio application, not a reusable component library.
+- For production email delivery, ensure the sender configured in `CONTACT_FROM_EMAIL` is verified in Resend.

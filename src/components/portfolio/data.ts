@@ -1,11 +1,11 @@
 export const heroText =
-  "Aspiring software engineer building modern, responsive, and efficient web applications.";
+  "Full stack software engineer building modern web applications.";
 
 export const navItems = [
   { label: "Expertise", href: "#expertise" },
-  { label: "Services", href: "#services" },
+  { label: "Capabilities", href: "#services" },
   { label: "Projects", href: "#projects" },
-  { label: "Work", href: "#work" },
+  { label: "Experience", href: "#work" },
   { label: "Contact", href: "#contact" },
 ] as const;
 
@@ -15,13 +15,13 @@ export const identityTabs = [
     label: "Developer",
     icon: "terminal",
     code: "CORE_DEVELOPER",
-    strap: "Responsive & Maintainable",
-    body: "I focus on frontend implementation that is modern, responsive, and cleanly structured. React, Next.js, TypeScript, and practical UI systems are where I do my best work.",
+    strap: "Full Stack & Scalable",
+    body: "I build full stack web applications that are modern, responsive, and cleanly structured from frontend to backend. React, Next.js, TypeScript, APIs, and database-driven systems are where I do my best work.",
     points: [
-      "Responsive layouts with React and Next.js",
-      "Semantic HTML, CSS, Tailwind, Bootstrap, and daisyUI",
-      "TypeScript-based component development",
-      "Maintainable frontend structure and clean code",
+      "Responsive interfaces with React, Next.js, and TypeScript",
+      "REST APIs and backend features with Node.js and ASP.NET",
+      "Database integration with PostgreSQL, MySQL, Prisma, and SQL",
+      "Clean, maintainable full stack architecture and practical UI systems",
     ],
   },
   {

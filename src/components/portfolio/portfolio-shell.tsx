@@ -102,7 +102,7 @@ export function PortfolioShell() {
     const section = projectsSectionRef.current;
     const viewport = projectsRailViewportRef.current;
     const track = projectsRailTrackRef.current;
-    if (!section || !viewport || !track || window.innerWidth < 768 || shouldReduceMotion) {
+    if (!section || !viewport || !track || window.innerWidth < 1280 || shouldReduceMotion) {
       return;
     }
 
@@ -366,12 +366,12 @@ export function PortfolioShell() {
       <div ref={cursorOutlineRef} className="cursor-outline" />
 
       <header className="fixed inset-x-0 top-0 z-50 border-b border-white/6 bg-black/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 sm:py-5 lg:px-12">
-          <div className="flex flex-col">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 sm:py-5 lg:px-12">
+          <div className="flex min-w-0 flex-1 flex-col md:flex-none">
             <span className="text-base font-extrabold uppercase tracking-[-0.04em] sm:text-lg">
               Nasimul Arafin Rounok
             </span>
-            <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[var(--color-accent)] sm:text-[10px] sm:tracking-[0.22em]">
+            <span className="block truncate font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[var(--color-accent)] sm:text-[10px] sm:tracking-[0.22em]">
               Software Engineer
             </span>
           </div>
@@ -391,7 +391,7 @@ export function PortfolioShell() {
           <button
             type="button"
             aria-label="Toggle navigation"
-            className="rounded-full border border-white/10 p-2 text-white/80 md:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white/80 transition hover:border-emerald-400/35 hover:text-[var(--color-accent)] md:hidden"
             onClick={() => setMobileMenuOpen((value) => !value)}
           >
             <Icon name="menu" className="h-5 w-5" />
@@ -404,14 +404,14 @@ export function PortfolioShell() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="overflow-hidden border-t border-white/6 bg-black/95 px-4 sm:px-6 md:hidden"
+              className="overflow-hidden border-t border-white/6 bg-black/95 px-4 pb-5 pt-4 sm:px-6 md:hidden"
             >
-              <div className="flex flex-col gap-4 py-5">
+              <div className="grid grid-cols-2 gap-3">
                 {navItems.map((item) => (
                   <a
                     key={item.href}
                     href={item.href}
-                    className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-white/70"
+                    className="glass-panel rounded-2xl px-4 py-3 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-white/80"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {item.label}
@@ -423,7 +423,7 @@ export function PortfolioShell() {
         </AnimatePresence>
       </header>
 
-      <section className="grid-shell relative isolate flex min-h-screen items-center overflow-hidden px-6 pt-28 lg:px-12">
+      <section className="grid-shell relative isolate flex min-h-screen items-center overflow-hidden px-4 pt-24 sm:px-6 sm:pt-28 lg:px-12">
         <motion.div
           style={{ y: heroOrbOneY }}
           className="absolute left-[-8%] top-24 h-64 w-64 rounded-full bg-emerald-400/15 blur-3xl"
@@ -436,9 +436,9 @@ export function PortfolioShell() {
         <div className="absolute inset-x-0 bottom-[-10rem] h-64 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.06),transparent_55%)]" />
         <motion.div
           style={{ y: heroY, opacity: heroOpacity }}
-          className="relative z-10 mx-auto grid w-full max-w-7xl gap-14 lg:grid-cols-[1.2fr_0.8fr] lg:items-end"
+          className="relative z-10 mx-auto grid w-full max-w-7xl gap-10 sm:gap-14 lg:grid-cols-[1.2fr_0.8fr] lg:items-end"
         >
-          <div>
+          <div className="order-2 lg:order-1">
           <motion.div
             {...fadeInUp}
             className="mb-8 inline-flex items-center gap-3 rounded-full border border-emerald-400/35 bg-emerald-400/10 px-4 py-2"
@@ -458,7 +458,7 @@ export function PortfolioShell() {
           <motion.h1
             {...fadeInUp}
             transition={{ ...fadeInUp.transition, delay: 0.08 }}
-            className="max-w-5xl text-4xl font-bold leading-[0.98] tracking-[-0.06em] md:text-6xl xl:text-8xl"
+            className="max-w-5xl text-[2.35rem] font-bold leading-[0.98] tracking-[-0.06em] sm:text-5xl md:text-6xl xl:text-7xl"
           >
             {typedText}
             <span className="typing-caret" />
@@ -467,7 +467,7 @@ export function PortfolioShell() {
           <motion.p
             {...fadeInUp}
             transition={{ ...fadeInUp.transition, delay: 0.16 }}
-            className="mt-6 max-w-2xl text-lg font-medium leading-8 text-[var(--color-soft)] md:text-xl"
+            className="mt-5 max-w-2xl text-base font-medium leading-7 text-[var(--color-soft)] sm:mt-6 sm:text-lg sm:leading-8 md:text-xl"
           >
             Skilled in React, Next.js, ASP.NET, Node.js, and database-backed application development with a focus on responsive interfaces and clean implementation.
           </motion.p>
@@ -475,14 +475,14 @@ export function PortfolioShell() {
           <motion.div
             {...fadeInUp}
             transition={{ ...fadeInUp.transition, delay: 0.24 }}
-            className="mt-10 flex flex-col gap-4 sm:flex-row sm:flex-wrap"
+            className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:gap-4"
           >
             <motion.a
               href="#projects"
               whileHover={{ y: -4, scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
               style={{ backgroundColor: "#3ddc97", color: "#050505" }}
-              className="inline-flex items-center justify-center rounded-sm px-8 py-4 font-mono text-sm font-bold uppercase tracking-[0.16em] shadow-[0_18px_40px_rgba(61,220,151,0.2)] transition hover:-translate-y-0.5"
+              className="inline-flex min-h-12 items-center justify-center rounded-sm px-6 py-3.5 text-center font-mono text-sm font-bold uppercase tracking-[0.16em] shadow-[0_18px_40px_rgba(61,220,151,0.2)] transition hover:-translate-y-0.5 sm:px-8 sm:py-4"
             >
               View Projects
             </motion.a>
@@ -493,7 +493,7 @@ export function PortfolioShell() {
               download
               whileHover={{ y: -4 }}
               whileTap={{ scale: 0.98 }}
-              className="inline-flex items-center justify-center gap-2 rounded-sm border border-emerald-400/35 bg-emerald-400/10 px-8 py-4 font-mono text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-accent)] transition hover:-translate-y-0.5 hover:border-emerald-300 hover:bg-emerald-400/16"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-sm border border-emerald-400/35 bg-emerald-400/10 px-6 py-3.5 text-center font-mono text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-accent)] transition hover:-translate-y-0.5 hover:border-emerald-300 hover:bg-emerald-400/16 sm:px-8 sm:py-4"
             >
               Download Resume
               <Icon name="externalLink" className="h-4 w-4" />
@@ -503,7 +503,7 @@ export function PortfolioShell() {
           <motion.div
             {...fadeInUp}
             transition={{ ...fadeInUp.transition, delay: 0.32 }}
-            className="mt-12 grid max-w-2xl gap-4 sm:grid-cols-3"
+            className="mt-10 grid max-w-2xl gap-3 sm:mt-12 sm:gap-4 sm:grid-cols-3"
           >
             {[
               { label: "Projects Built", value: "7+" },
@@ -527,7 +527,7 @@ export function PortfolioShell() {
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.9, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="mx-auto w-full max-w-sm sm:max-w-xl lg:mx-0 lg:max-w-none"
+            className="order-1 mx-auto w-full max-w-[22rem] sm:max-w-xl lg:order-2 lg:mx-0 lg:max-w-none"
           >
             <div className="glass-panel overflow-hidden rounded-[2rem]">
               {!profilePhotoMissing ? (
@@ -535,7 +535,7 @@ export function PortfolioShell() {
                   <img
                     src="/profile-photo.jpg"
                     alt="Professional portrait"
-                    className="h-[22rem] w-full object-cover object-center sm:h-[28rem] lg:h-[34rem]"
+                    className="h-[24rem] w-full object-cover object-[center_20%] sm:h-[30rem] sm:object-[center_18%] lg:h-[34rem] lg:object-center"
                     onError={() => setProfilePhotoMissing(true)}
                   />
                   <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.02),rgba(0,0,0,0.18)_72%,rgba(0,0,0,0.38))]" />
@@ -821,9 +821,9 @@ export function PortfolioShell() {
       <section
         id="projects"
         ref={projectsSectionRef}
-        className="overflow-hidden bg-black/40 py-20 sm:py-24 md:py-0"
+        className="bg-black/40 py-20 sm:py-24 xl:overflow-hidden xl:py-0"
       >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-12 md:flex md:h-screen md:flex-col md:justify-center">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-12 xl:flex xl:h-screen xl:flex-col xl:justify-center">
           <motion.div {...fadeInUp} className="mb-12 grid gap-12 lg:grid-cols-12 lg:items-end">
             <div className="lg:col-span-5">
               <h2 className="text-4xl font-bold tracking-[-0.05em] md:text-6xl">
@@ -833,7 +833,7 @@ export function PortfolioShell() {
                 Selected projects from frontend, backend, database, and academic application work.
               </p>
             </div>
-            <div className="hidden lg:col-span-7 md:flex md:items-end md:justify-end">
+            <div className="hidden lg:col-span-7 xl:flex xl:items-end xl:justify-end">
               <div className="w-full max-w-sm">
                 <div className="mb-3 flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.18em] text-white/35">
                   <span>Project Archive</span>
@@ -849,7 +849,7 @@ export function PortfolioShell() {
             </div>
           </motion.div>
 
-          <div ref={projectsRailViewportRef} className="relative hidden overflow-hidden md:block">
+          <div ref={projectsRailViewportRef} className="relative hidden overflow-hidden xl:block">
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-[linear-gradient(90deg,rgba(5,5,5,0.96),rgba(5,5,5,0))]" />
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-[linear-gradient(270deg,rgba(5,5,5,0.96),rgba(5,5,5,0))]" />
 
@@ -914,8 +914,8 @@ export function PortfolioShell() {
             </div>
           </div>
 
-          <div className="relative md:hidden">
-            <div className="hide-scrollbar -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 sm:-mx-6 sm:px-6">
+          <div className="xl:hidden">
+            <div className="grid gap-5 md:grid-cols-2">
               {projects.map((project, index) => (
                 <motion.article
                   key={project.name}
@@ -925,10 +925,10 @@ export function PortfolioShell() {
                   viewport={{ once: true, amount: 0.2 }}
                   transition={{ delay: index * 0.06, duration: 0.65 }}
                   whileHover={{ y: -8 }}
-                  className="glass-panel group flex min-h-[29rem] w-[min(22rem,88vw)] shrink-0 snap-start flex-col overflow-hidden rounded-[1.5rem] sm:min-h-[31rem] sm:w-[min(24rem,82vw)] sm:rounded-[1.75rem]"
+                  className="glass-panel group flex min-h-[27rem] min-w-0 flex-col overflow-hidden rounded-[1.5rem] sm:min-h-[29rem] sm:rounded-[1.75rem]"
                 >
                   <div
-                    className={`relative flex h-56 items-end overflow-hidden bg-gradient-to-br p-5 sm:h-64 sm:p-6 ${project.gradient}`}
+                    className={`relative flex h-52 items-end overflow-hidden bg-gradient-to-br p-5 sm:h-56 md:h-60 sm:p-6 ${project.gradient}`}
                   >
                     <motion.div
                       whileHover={{ scale: 1.04 }}
@@ -1388,8 +1388,8 @@ export function PortfolioShell() {
               >
                 {contactFeedback || "Replies are sent directly to my inbox."}
               </p>
-              <div className="flex flex-col gap-4 pt-2 sm:flex-row sm:items-center sm:justify-between">
-                <span className="font-mono text-sm font-semibold uppercase tracking-[0.18em]">
+              <div className="flex items-center justify-between gap-4 pt-2">
+                <span className="pr-2 font-mono text-sm font-semibold uppercase tracking-[0.18em]">
                   {contactStatus === "loading" ? "Sending..." : "Send Message"}
                 </span>
                 <motion.button
@@ -1397,7 +1397,7 @@ export function PortfolioShell() {
                   whileHover={{ x: 3, scale: 1.04 }}
                   whileTap={{ scale: 0.97 }}
                   disabled={contactStatus === "loading"}
-                  className="flex h-12 w-12 self-start items-center justify-center rounded-full bg-[var(--color-accent)] text-black transition hover:bg-emerald-300 sm:self-auto"
+                  className="flex h-12 w-12 shrink-0 items-center justify-center self-auto rounded-full bg-[var(--color-accent)] text-black transition hover:bg-emerald-300"
                 >
                   <Icon name="arrowRight" className="h-5 w-5" />
                 </motion.button>
